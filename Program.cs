@@ -1,0 +1,261 @@
+﻿// See https://aka.ms/new-console-template for more information
+
+using System.Runtime.CompilerServices;
+using System;
+using System.Collections.Generic;
+using static BTM.Rep0;
+using static BTM.Rep0;
+
+//Console.WriteLine("Hello, World!");
+using System.Security.AccessControl;
+
+//Console.WriteLine("Hello, World!");
+
+
+namespace BTM
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            //Dictionary<int,string> map = new Dictionary<int,string>();
+            //Console.WriteLine("Hello, World!");
+
+            //Linie
+
+            #region rep0
+            Rep0.Line L016, L023, L014;
+            Rep0.Stop S01, S02, S03, S04, S05, S06, S07, S08, S09;
+
+            L016 = new Rep0.Line(10.ToString(), 16, "SIMD");
+            L023 = new Rep0.Line(17.ToString(), 23, "Isengard - Mordor");
+            L014 = new Rep0.Line("E", 14, "Museum of Plant");
+
+            //List<Rep0.Line> ListL016 = new List<Rep0.Line> { L016};
+            //List<Rep0.Line> ListL023 = new List<Rep0.Line>();
+            //int[] p = [23,23,23];
+            //ListL023.Add(L023);
+            S01 = new Rep0.Stop(1, "SPIR - V", "bus", new List<Rep0.Line> { L016 });
+            S02 = new Rep0.Stop(2, "GLSL", "tram", new List<Rep0.Line> { L016 });
+            S03 = new Rep0.Stop(3, "HLSL", "other", new List<Rep0.Line> { L016 });
+            S04 = new Rep0.Stop(4, "Dol Guldur", "bus", new List<Rep0.Line> { L023 });
+            S05 = new Rep0.Stop(5, "Amon Hen", "bus", new List<Rep0.Line> { L023 });
+            S06 = new Rep0.Stop(6, "Gondolin", "bus", new List<Rep0.Line> { L023 });
+            S07 = new Rep0.Stop(7, "Bitazon", "tram", new List<Rep0.Line> { L023, L014 });
+            S08 = new Rep0.Stop(8, "Bytecroft", "bus", new List<Rep0.Line> { L016, L023 });
+            S09 = new Rep0.Stop(9, "Maple", "other", new List<Rep0.Line> { L014 });
+
+            L016.setStops = new List<Rep0.Stop> { S01, S02, S03, S08 };
+            L023.setStops = new List<Rep0.Stop> { S04, S05, S06, S07 };
+            L014.setStops = new List<Rep0.Stop> { S07, S08, S09 };
+
+
+            Rep0.Bytebus B011 = new Rep0.Bytebus(11, null, "Byte5");
+            Rep0.Bytebus B012 = new Rep0.Bytebus(12, null, "bisel20");
+            Rep0.Bytebus B013 = new Rep0.Bytebus(13, null, "bisel20");
+            Rep0.Bytebus B014 = new Rep0.Bytebus(14, null, "gibgaz");
+            Rep0.Bytebus B015 = new Rep0.Bytebus(15, null, "gibgaz");
+
+            B011.setLines = new List<Rep0.Line> { L016, L023 };
+            B012.setLines = new List<Rep0.Line> { L016 };
+            B013.setLines = new List<Rep0.Line> { L016 };
+            B014.setLines = new List<Rep0.Line> { L023, L014 };
+            B015.setLines = new List<Rep0.Line> { L023 };
+
+            Rep0.Tram T021 = new Rep0.Tram(21, 1, L014);
+            Rep0.Tram T022 = new Rep0.Tram(22, 2, L014);
+            Rep0.Tram T023 = new Rep0.Tram(23, 6, L014);
+
+            Rep0.Driver D01 = new Rep0.Driver("Tomas", "Chairman", 20, new List<Rep0.Vehicle> { B011, T021, B015 });
+            Rep0.Driver D02 = new Rep0.Driver("Tomas", "Thetank", 4, new List<Rep0.Vehicle> { B012, B013, B014 });
+            Rep0.Driver D03 = new Rep0.Driver("Oru", "Bii", 55, new List<Rep0.Vehicle> { T022, T023 });
+
+            List<Rep0.Line> lines0 = new List<Rep0.Line> { L016, L023, L014 };
+            List<Rep0.Stop> stops0 = new List<Rep0.Stop> { S01, S02, S03, S04, S05, S06, S07, S08, S09 };
+            List<Rep0.Vehicle> vehicles0 = new List<Rep0.Vehicle> { B011, B012, B013, B014, B015, T021, T022, T023 };
+            List<Rep0.Driver> drivers0 = new List<Rep0.Driver> { D01, D02, D03 };
+
+            L016.setVehicles = new List<Rep0.Vehicle> { B011, B012, B013 };
+            L023.setVehicles = new List<Rep0.Vehicle> { B011, B014, B015 };
+            L014.setVehicles = new List<Rep0.Vehicle> { B014, T021, T022, T023 };
+
+            #endregion rep0
+            ////////////////////////
+            // reprezenatcja 6//
+            ////////////////////////////
+            ///
+            # region rep6
+            Adapt_rep6_Line A6L_16, A6L_23, A6L_14;
+            Adapt_rep6_Stop A6S_1, A6S_2, A6S_3, A6S_4, A6S_5, A6S_6, A6S_7,A6S_8,A6S_9;
+
+            A6L_16 = new(10.ToString(), 16, "SIMD");
+            A6L_23 = new (17.ToString(), 23, "Isengard - Mordor");
+            A6L_14 = new ("E", 14, "Museum of Plant");
+
+            //List<Rep0.Line> ListL016 = new List<Rep0.Line> { L016};
+            //List<Rep0.Line> ListL023 = new List<Rep0.Line>();
+            //int[] p = [23,23,23];
+            //ListL023.Add(L023);
+            A6S_1 = new (1, "SPIR - V", "bus", new List<Adapt_rep6_Line> { A6L_16});
+            A6S_2 = new (2, "GLSL", "tram", new List<Adapt_rep6_Line> { A6L_16 });
+            A6S_3 = new (3, "HLSL", "other", new List<Adapt_rep6_Line> { A6L_16 });
+            A6S_4 = new (4, "Dol Guldur", "bus", new List<Adapt_rep6_Line> { A6L_23 });
+            A6S_5 = new (5, "Amon Hen", "bus", new List<Adapt_rep6_Line> { A6L_23 });
+            A6S_6 = new (6, "Gondolin", "bus", new List<Adapt_rep6_Line> { A6L_23 });
+            A6S_7 = new (7, "Bitazon", "tram", new List<Adapt_rep6_Line> { A6L_23, A6L_14 });
+            A6S_8 = new (8, "Bytecroft", "bus", new List<Adapt_rep6_Line> { A6L_16, A6L_23 });
+            A6S_9 = new (9, "Maple", "other", new List<Adapt_rep6_Line> { A6L_14 });
+
+            A6L_16.SetStops = new List<Adapt_rep6_Stop> { A6S_1, A6S_2, A6S_3, A6S_8 };
+            A6L_23.SetStops = new List<Adapt_rep6_Stop> { A6S_4, A6S_5, A6S_6, A6S_7 };
+            A6L_14.SetStops = new List<Adapt_rep6_Stop> { A6S_7, A6S_8, A6S_9 };
+
+
+            Adapt_rep6_Bytebus A6B_11 = new(11, new List<Adapt_rep6_Line> { A6L_16, A6L_23 }, "Byte5");
+            Adapt_rep6_Bytebus A6B_12 = new(12, new List<Adapt_rep6_Line> { A6L_16 }, "bisel20");
+            Adapt_rep6_Bytebus A6B_13 = new(13, new List<Adapt_rep6_Line> { A6L_16 }, "bisel20");
+            Adapt_rep6_Bytebus A6B_14 = new(14, new List<Adapt_rep6_Line> { A6L_23, A6L_14 }, "gibgaz");
+            Adapt_rep6_Bytebus A6B_15 = new(15, new List<Adapt_rep6_Line> { A6L_23 }, "gibgaz");
+
+
+
+            Adapt_rep6_Tram A6T_21 = new(21, 1, A6L_14);
+            Adapt_rep6_Tram A6T_22 = new(22, 2, A6L_14);
+            Adapt_rep6_Tram A6T_23 = new(23, 6, A6L_14);
+
+            Adapt_rep6_Driver A6D_1 = new("Tomas", "Chairman", 20, new List<Adapt_rep6_Vehicle> { A6B_11, A6T_21, A6B_15 });
+            Adapt_rep6_Driver A6D_2 = new("Tomas", "Thetank", 4, new List<Adapt_rep6_Vehicle> { A6B_12, A6B_13, A6B_14 });
+            Adapt_rep6_Driver A6D_3 = new("Oru", "Bii", 55, new List<Adapt_rep6_Vehicle> { A6T_22, A6T_23 });
+
+            List<Adapt_rep6_Line> lines6 = new List<Adapt_rep6_Line> { A6L_16, A6L_23, A6L_14 };
+            List<Adapt_rep6_Stop> stops6 = new List<Adapt_rep6_Stop> { A6S_1, A6S_2, A6S_3, A6S_4, A6S_5, A6S_6, A6S_7, A6S_8, A6S_9 };
+            List<Adapt_rep6_Vehicle> vehicles6 = new List<Adapt_rep6_Vehicle> { A6B_11, A6B_12, A6B_13, A6B_14, A6B_15, A6T_21, A6T_22, A6T_23 };
+            List<Adapt_rep6_Driver> drivers6 = new List<Adapt_rep6_Driver> { A6D_1, A6D_2, A6D_3 };
+
+            A6L_16.setVehicles = new List<Adapt_rep6_Vehicle> { A6B_11, A6B_12, A6B_13 };
+            A6L_23.setVehicles = new List<Adapt_rep6_Vehicle> { A6B_11, A6B_14, A6B_15 };
+            A6L_14.setVehicles = new List<Adapt_rep6_Vehicle> { A6B_14, A6T_21, A6T_22, A6T_23 };
+            #endregion rep6
+
+            #region rep4
+            Adapt_rep4_Line A4L_16, A4L_23, A4L_14;
+            Adapt_rep4_Stop A4S_1, A4S_2, A4S_3, A4S_4, A4S_5, A4S_6, A4S_7, A4S_8, A4S_9;
+
+            A4L_16 = new(10.ToString(), 16, "SIMD");
+            A4L_23 = new(17.ToString(), 23, "Isengard - Mordor");
+            A4L_14 = new("E", 14, "Museum of Plant");
+
+            //List<Rep0.Line> ListL016 = new List<Rep0.Line> { L016};
+            //List<Rep0.Line> ListL023 = new List<Rep0.Line>();
+            //int[] p = [23,23,23];
+            //ListL023.Add(L023);
+            A4S_1 = new(1, "SPIR - V", "bus", new List<Adapt_rep4_Line> { A4L_16 });
+            A4S_2 = new(2, "GLSL", "tram", new List<Adapt_rep4_Line> { A4L_16 });
+            A4S_3 = new(3, "HLSL", "other", new List<Adapt_rep4_Line> { A4L_16 });
+            A4S_4 = new(4, "Dol Guldur", "bus", new List<Adapt_rep4_Line> { A4L_23 });
+            A4S_5 = new(5, "Amon Hen", "bus", new List<Adapt_rep4_Line> { A4L_23 });
+            A4S_6 = new(6, "Gondolin", "bus", new List<Adapt_rep4_Line> { A4L_23 });
+            A4S_7 = new(7, "Bitazon", "tram", new List<Adapt_rep4_Line> { A4L_23, A4L_14 });
+            A4S_8 = new(8, "Bytecroft", "bus", new List<Adapt_rep4_Line> { A4L_16, A4L_23 });
+            A4S_9 = new(9, "Maple", "other", new List<Adapt_rep4_Line> { A4L_14 });
+
+            A4L_16.SetStops = new List<Adapt_rep4_Stop> { A4S_1, A4S_2, A4S_3, A4S_8 };
+            A4L_23.SetStops = new List<Adapt_rep4_Stop> { A4S_4, A4S_5, A4S_6, A4S_7 };
+            A4L_14.SetStops = new List<Adapt_rep4_Stop> { A4S_7, A4S_8, A4S_9 };
+
+
+            Adapt_rep4_Bytebus A4B_11 = new(11, new List<Adapt_rep4_Line> { A4L_16, A4L_23 }, "Byte5");
+            Adapt_rep4_Bytebus A4B_12 = new(12, new List<Adapt_rep4_Line> { A4L_16 }, "bisel20");
+            Adapt_rep4_Bytebus A4B_13 = new(13, new List<Adapt_rep4_Line> { A4L_16 }, "bisel20");
+            Adapt_rep4_Bytebus A4B_14 = new(14, new List<Adapt_rep4_Line> { A4L_23, A4L_14 }, "gibgaz");
+            Adapt_rep4_Bytebus A4B_15 = new(15, new List<Adapt_rep4_Line> { A4L_23 }, "gibgaz");
+
+
+
+            Adapt_rep4_Tram A4T_21 = new(21, 1, A4L_14);
+            Adapt_rep4_Tram A4T_22 = new(22, 2, A4L_14);
+            Adapt_rep4_Tram A4T_23 = new(23, 6, A4L_14);
+
+            Adapt_rep4_Driver A4D_1 = new("Tomas", "Chairman", 20, new List<Adapt_rep4_Vehicle> { A4B_11, A4T_21, A4B_15 });
+            Adapt_rep4_Driver A4D_2 = new("Tomas", "Thetank", 4, new List<Adapt_rep4_Vehicle> { A4B_12, A4B_13, A4B_14 });
+            Adapt_rep4_Driver A4D_3 = new("Oru", "Bii", 55, new List<Adapt_rep4_Vehicle> { A4T_22, A4T_23 });
+
+            List<Adapt_rep4_Line> lines4 = new List<Adapt_rep4_Line> { A4L_16, A4L_23, A4L_14 };
+            List<Adapt_rep4_Stop> stops4 = new List<Adapt_rep4_Stop> { A4S_1, A4S_2, A4S_3, A4S_4, A4S_5, A4S_6, A4S_7, A4S_8, A4S_9 };
+            List<Adapt_rep4_Vehicle> vehicles4 = new List<Adapt_rep4_Vehicle> { A4B_11, A4B_12, A4B_13, A4B_14, A4B_15, A4T_21, A4T_22, A4T_23 };
+            List<Adapt_rep4_Driver> drivers4 = new List<Adapt_rep4_Driver> { A4D_1, A4D_2, A4D_3 };
+
+            A4L_16.SetVehicles = new List<Adapt_rep4_Vehicle> { A4B_11, A4B_12, A4B_13 };
+            A4L_23.SetVehicles = new List<Adapt_rep4_Vehicle> { A4B_11, A4B_14, A4B_15 };
+            A4L_14.SetVehicles = new List<Adapt_rep4_Vehicle> { A4B_14, A4T_21, A4T_22, A4T_23 };
+            #endregion rep4
+
+            /*
+            Console.WriteLine("\nLine - number(hex + decimal), commonName, stops, vehicles");
+
+            foreach (var l in lines0)
+            {
+                Console.WriteLine(l);
+            }
+
+            Console.WriteLine("\nStop - id, name, type, lines(decimal)");
+
+            foreach (var s in stops0)
+            {
+                Console.WriteLine(s);
+            }
+
+            Console.WriteLine("\nBytebus - id, lines, engineClass");
+            foreach (var v in vehicles0)
+            {
+                if (v is Rep0.Bytebus) Console.WriteLine(v);
+            }
+
+            Console.WriteLine("\nTram - id, carsNumber, line");
+            foreach (var v in vehicles0)
+            {
+                if (v is Rep0.Tram) Console.WriteLine(v);
+            }
+
+            Console.WriteLine("\nDriver - name, surname, seniority, vehicles\n");
+
+            foreach (var d in drivers0)
+            {
+                Console.WriteLine(d);
+            }
+            */
+
+            Console.WriteLine("reprezentacja 0");
+            PrintTask(new List<ILine>(lines0), new List<IDriver>(drivers0));
+
+            Console.WriteLine("\n\nreprezentacja 6");
+            PrintTask(new List<ILine> (lines6), new List<IDriver>(drivers6));
+
+            Console.WriteLine("\n\nreprezentacja 4");
+            PrintTask(new List<ILine>(lines4), new List<IDriver>(drivers4));
+
+        }
+
+        public static void  PrintTask(List<ILine> Lines, List<IDriver> drivers)
+        {
+            List<IVehicle> vehs_L = new();
+            List<IVehicle> vehs_D = new();
+
+            foreach (var d in drivers)
+            {
+                if(d.Seniority > 10)    vehs_D.AddRange(d.Vehicles);
+            }
+            foreach (var L in Lines)
+            {
+                List<IVehicle> vehs_tmp = new List<IVehicle>(vehs_D);
+                vehs_tmp.Intersect(L.Vehicles);
+                if(vehs_tmp.Count > 0)
+                {
+                    Console.WriteLine($"{L.CommonName}, {L.NumberDec}");
+                }
+            }
+           
+
+        }
+    }
+}
