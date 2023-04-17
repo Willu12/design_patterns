@@ -17,6 +17,7 @@ namespace BTM
     public interface IVehicle
     {
         int Id { get; set; }
+        List<IDriver> Drivers {get;}
     }
 
     public interface IStop
@@ -49,8 +50,27 @@ namespace BTM
     public interface ICollection<T>
     {
         void Add(T obj);
-        void Delete(T obj);
-        //CreateForwardIterator
+        bool Delete(T obj);
+        Iiterator<T> CreateForwardIterator();
+        Iiterator<T> CreateReverseIterator();
+
     }
 
+    public interface IPredicate<T>
+    {
+        public bool eval(T item);
+    }
+
+    public interface IFunction<T>
+    {
+        public void f(T item);
+    }
+
+    public interface Iiterator<T>
+    {
+        void First();
+        void Next();
+        bool isDone();
+        T currentItem();
+    }
 }

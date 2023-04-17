@@ -1,5 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
+
 using System.Runtime.CompilerServices;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,9 @@ using static BTM.Rep0;
 using System.Security.AccessControl;
 
 //Console.WriteLine("Hello, World!");
-
+using  BTM.Tree;
+using System.Diagnostics;
+using System.Security.Cryptography.X509Certificates;
 
 namespace BTM
 {
@@ -18,11 +21,6 @@ namespace BTM
     {
         static void Main(string[] args)
         {
-            //Dictionary<int,string> map = new Dictionary<int,string>();
-            //Console.WriteLine("Hello, World!");
-
-            //Linie
-
             #region rep0
             Rep0.Line L016, L023, L014;
             Rep0.Stop S01, S02, S03, S04, S05, S06, S07, S08, S09;
@@ -70,7 +68,7 @@ namespace BTM
             Rep0.Driver D02 = new Rep0.Driver("Tomas", "Thetank", 4, new List<Rep0.Vehicle> { B012, B013, B014 });
             Rep0.Driver D03 = new Rep0.Driver("Oru", "Bii", 55, new List<Rep0.Vehicle> { T022, T023 });
 
-            List<Rep0.Line> lines0 = new List<Rep0.Line> { L016, L023, L014 };
+            List<Rep0.Line> lines0 = new List<Rep0.Line> { L023, L016, L014 };
             List<Rep0.Stop> stops0 = new List<Rep0.Stop> { S01, S02, S03, S04, S05, S06, S07, S08, S09 };
             List<Rep0.Vehicle> vehicles0 = new List<Rep0.Vehicle> { B011, B012, B013, B014, B015, T021, T022, T023 };
             List<Rep0.Driver> drivers0 = new List<Rep0.Driver> { D01, D02, D03 };
@@ -79,6 +77,14 @@ namespace BTM
             L023.setVehicles = new List<Rep0.Vehicle> { B011, B014, B015 };
             L014.setVehicles = new List<Rep0.Vehicle> { B014, T021, T022, T023 };
 
+            foreach (Rep0.Driver d in drivers0)
+            {
+                foreach (var v in d.GetAdaptVehicles)
+                {
+                    v.AddDriver(d);
+                }
+            }
+
             #endregion rep0
             ////////////////////////
             // reprezenatcja 6//
@@ -86,25 +92,25 @@ namespace BTM
             ///
             # region rep6
             Adapt_rep6_Line A6L_16, A6L_23, A6L_14;
-            Adapt_rep6_Stop A6S_1, A6S_2, A6S_3, A6S_4, A6S_5, A6S_6, A6S_7,A6S_8,A6S_9;
+            Adapt_rep6_Stop A6S_1, A6S_2, A6S_3, A6S_4, A6S_5, A6S_6, A6S_7, A6S_8, A6S_9;
 
             A6L_16 = new(10.ToString(), 16, "SIMD");
-            A6L_23 = new (17.ToString(), 23, "Isengard - Mordor");
-            A6L_14 = new ("E", 14, "Museum of Plant");
+            A6L_23 = new(17.ToString(), 23, "Isengard - Mordor");
+            A6L_14 = new("E", 14, "Museum of Plant");
 
             //List<Rep0.Line> ListL016 = new List<Rep0.Line> { L016};
             //List<Rep0.Line> ListL023 = new List<Rep0.Line>();
             //int[] p = [23,23,23];
             //ListL023.Add(L023);
-            A6S_1 = new (1, "SPIR - V", "bus", new List<Adapt_rep6_Line> { A6L_16});
-            A6S_2 = new (2, "GLSL", "tram", new List<Adapt_rep6_Line> { A6L_16 });
-            A6S_3 = new (3, "HLSL", "other", new List<Adapt_rep6_Line> { A6L_16 });
-            A6S_4 = new (4, "Dol Guldur", "bus", new List<Adapt_rep6_Line> { A6L_23 });
-            A6S_5 = new (5, "Amon Hen", "bus", new List<Adapt_rep6_Line> { A6L_23 });
-            A6S_6 = new (6, "Gondolin", "bus", new List<Adapt_rep6_Line> { A6L_23 });
-            A6S_7 = new (7, "Bitazon", "tram", new List<Adapt_rep6_Line> { A6L_23, A6L_14 });
-            A6S_8 = new (8, "Bytecroft", "bus", new List<Adapt_rep6_Line> { A6L_16, A6L_23 });
-            A6S_9 = new (9, "Maple", "other", new List<Adapt_rep6_Line> { A6L_14 });
+            A6S_1 = new(1, "SPIR - V", "bus", new List<Adapt_rep6_Line> { A6L_16 });
+            A6S_2 = new(2, "GLSL", "tram", new List<Adapt_rep6_Line> { A6L_16 });
+            A6S_3 = new(3, "HLSL", "other", new List<Adapt_rep6_Line> { A6L_16 });
+            A6S_4 = new(4, "Dol Guldur", "bus", new List<Adapt_rep6_Line> { A6L_23 });
+            A6S_5 = new(5, "Amon Hen", "bus", new List<Adapt_rep6_Line> { A6L_23 });
+            A6S_6 = new(6, "Gondolin", "bus", new List<Adapt_rep6_Line> { A6L_23 });
+            A6S_7 = new(7, "Bitazon", "tram", new List<Adapt_rep6_Line> { A6L_23, A6L_14 });
+            A6S_8 = new(8, "Bytecroft", "bus", new List<Adapt_rep6_Line> { A6L_16, A6L_23 });
+            A6S_9 = new(9, "Maple", "other", new List<Adapt_rep6_Line> { A6L_14 });
 
             A6L_16.SetStops = new List<Adapt_rep6_Stop> { A6S_1, A6S_2, A6S_3, A6S_8 };
             A6L_23.SetStops = new List<Adapt_rep6_Stop> { A6S_4, A6S_5, A6S_6, A6S_7 };
@@ -135,6 +141,14 @@ namespace BTM
             A6L_16.setVehicles = new List<Adapt_rep6_Vehicle> { A6B_11, A6B_12, A6B_13 };
             A6L_23.setVehicles = new List<Adapt_rep6_Vehicle> { A6B_11, A6B_14, A6B_15 };
             A6L_14.setVehicles = new List<Adapt_rep6_Vehicle> { A6B_14, A6T_21, A6T_22, A6T_23 };
+
+            foreach (Adapt_rep6_Driver d in drivers6)
+            {
+                foreach (var v in d.GetAdaptVehicles)
+                {
+                    v.AddDriver(d);
+                }
+            }
             #endregion rep6
 
             #region rep4
@@ -188,74 +202,35 @@ namespace BTM
             A4L_16.SetVehicles = new List<Adapt_rep4_Vehicle> { A4B_11, A4B_12, A4B_13 };
             A4L_23.SetVehicles = new List<Adapt_rep4_Vehicle> { A4B_11, A4B_14, A4B_15 };
             A4L_14.SetVehicles = new List<Adapt_rep4_Vehicle> { A4B_14, A4T_21, A4T_22, A4T_23 };
-            #endregion rep4
 
-            /*
-            Console.WriteLine("\nLine - number(hex + decimal), commonName, stops, vehicles");
-
-            foreach (var l in lines0)
+            foreach (Adapt_rep4_Driver d in drivers4)
             {
-                Console.WriteLine(l);
-            }
-
-            Console.WriteLine("\nStop - id, name, type, lines(decimal)");
-
-            foreach (var s in stops0)
-            {
-                Console.WriteLine(s);
-            }
-
-            Console.WriteLine("\nBytebus - id, lines, engineClass");
-            foreach (var v in vehicles0)
-            {
-                if (v is Rep0.Bytebus) Console.WriteLine(v);
-            }
-
-            Console.WriteLine("\nTram - id, carsNumber, line");
-            foreach (var v in vehicles0)
-            {
-                if (v is Rep0.Tram) Console.WriteLine(v);
-            }
-
-            Console.WriteLine("\nDriver - name, surname, seniority, vehicles\n");
-
-            foreach (var d in drivers0)
-            {
-                Console.WriteLine(d);
-            }
-            */
-
-            Console.WriteLine("reprezentacja 0");
-            PrintTask(new List<ILine>(lines0), new List<IDriver>(drivers0));
-
-            Console.WriteLine("\n\nreprezentacja 6");
-            PrintTask(new List<ILine> (lines6), new List<IDriver>(drivers6));
-
-            Console.WriteLine("\n\nreprezentacja 4");
-            PrintTask(new List<ILine>(lines4), new List<IDriver>(drivers4));
-
-        }
-
-        public static void  PrintTask(List<ILine> Lines, List<IDriver> drivers)
-        {
-            List<IVehicle> vehs_L = new();
-            List<IVehicle> vehs_D = new();
-
-            foreach (var d in drivers)
-            {
-                if(d.Seniority > 10)    vehs_D.AddRange(d.Vehicles);
-            }
-            foreach (var L in Lines)
-            {
-                List<IVehicle> vehs_tmp = new List<IVehicle>(vehs_D);
-                vehs_tmp.Intersect(L.Vehicles);
-                if(vehs_tmp.Count > 0)
+                foreach (var v in d.GetAdaptVehicles)
                 {
-                    Console.WriteLine($"{L.CommonName}, {L.NumberDec}");
+                    v.AddDriver(d);
                 }
             }
-           
 
+            #endregion rep4
+
+            Func<ILine,bool> pred = Algorithms.f;
+            BiList<ILine> biLines0 = new BiList<ILine>(new List<ILine>(lines0));
+            BinaryTree<ILine> binaryTreeLines0 = new BinaryTree<ILine>(new List<ILine>(lines0));
+            Vector<ILine> vectorLines = new Vector<ILine>(new List<ILine>(lines0));
+
+            Console.WriteLine("reprezentacja 0");
+            //PrintTask(new List<ILine>(lines0), new List<IDriver>(drivers0));
+            //Print<ILine>(biLines0, f);
+
+            Console.WriteLine("\n\nreprezentacja 6");
+           // PrintTask(new List<ILine>(lines6), new List<IDriver>(drivers6));
+
+            Console.WriteLine("\n\nreprezentacja 4");
+            //PrintTask(new List<ILine>(lines4), new List<IDriver>(drivers4));
+
+            Console.WriteLine(Algorithms.Find<ILine>(binaryTreeLines0.CreateReverseIterator(), new Predicate()));
+            Algorithms.ForEach<ILine>(binaryTreeLines0.CreateReverseIterator(), new Function());
+            return;
         }
     }
 }

@@ -25,7 +25,10 @@ namespace BTM
                 this.vehicles = vehicles;
             }
 
-
+            public ILine Clone()
+            {
+                return new Line(this.NumberHex, this.numberDec, this.commonName, this.stops, this.vehicles);
+            }
             public int NumberDec { get => numberDec; set => numberDec = value; }
             public List<IVehicle> Vehicles { get => new List<IVehicle>(vehicles); }// set => vehicles = value; }
             public List<Vehicle> setVehicles { set => vehicles = value; }
@@ -91,15 +94,25 @@ namespace BTM
         public abstract class Vehicle : IVehicle
         {
             private int id;
+            private List<Driver> drivers;
             public int Id { get => id; set => id = value; }
+            
             public Vehicle(int id)
             {
                 this.id = id;
+                drivers = new List<Driver>();
             }
             public override string ToString()
             {
                 return $"id = {id}";
             }
+
+            public void AddDriver(Driver d)
+            {
+                drivers.Add(d);
+            }
+
+            public List<IDriver> Drivers { get => new List<IDriver>(drivers); }
         }
 
         public class Bytebus : Vehicle, IBytebus
@@ -173,6 +186,8 @@ namespace BTM
             public string Name { get => name; set => name = value; }
             public string Surname { get => surname; set => surname = value; }
             public int Seniority { get => seniority; set => seniority = value; }
+
+            public List<Vehicle> GetAdaptVehicles { get => vehicles; }
 
             public List<IVehicle> Vehicles { get => new List<IVehicle>(vehicles); }
 

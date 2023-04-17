@@ -31,11 +31,13 @@ namespace BTM
 
         public abstract class Vehicle
         {
+            public Dictionary<string, string> Map = new Dictionary<string, string>();
             public int id;
             public int Id { get => id; set => id = value; }
-            public Vehicle(int id)
+            public Vehicle(int id, Dictionary<string, string> map)
             {
                 this.id = id;
+                Map = map;
             }
         }
 
@@ -43,7 +45,7 @@ namespace BTM
         {
             public Dictionary<string, string> Map = new Dictionary<string, string>();
 
-            public Bytebus(int id, Dictionary<string, string> map) : base(id)
+            public Bytebus(int id, Dictionary<string, string> map) : base(id,null)
             {
                 Map = map;
             }
@@ -53,7 +55,7 @@ namespace BTM
         {
             public Dictionary<string, string> Map = new Dictionary<string, string>();
 
-            public Tram(int id, Dictionary<string, string> map) : base(id)
+            public Tram(int id, Dictionary<string, string> map) : base(id,null)
             {
                 Map = map;
             }
@@ -171,6 +173,11 @@ namespace BTM
                 }
             }
         }
+        public override string ToString()
+        {
+            string s = $"{this.NumberHex}, {this.NumberDec}, {this.CommonName}";
+            return s;
+        }
     }
 
     public class Adapt_rep6_Stop : IStop
@@ -240,14 +247,42 @@ namespace BTM
     public abstract class Adapt_rep6_Vehicle : IVehicle
     {
         private int _id;
+        private Dictionary<string, string> map;
         public static Dictionary<int, Adapt_rep6_Vehicle> vehiclesMap = new Dictionary<int, Adapt_rep6_Vehicle>();
 
 
         public Adapt_rep6_Vehicle(int id)
         {
+            map = new Dictionary<string, string>();
+            map["drivers.Size()"] = "0";
+
             _id = id;
         }
         public int Id { get => _id; set => _id = value; }
+
+        public void AddDriver(Adapt_rep6_Driver d)
+        {
+
+            int len = int.Parse(map["drivers.Size()"]) + 1;
+
+            map[$"drivers[{len++}]"] = d.Id.ToString();
+
+            map["drivers.Size()"] = len.ToString();
+        }
+
+        public List<IDriver> Drivers
+        {
+            get
+            {
+                int len = int.Parse(map["drivers.Size()"]);
+                List<IDriver> drivers = new List<IDriver>();
+                for (int i = 0; i < len; i++)
+                {
+                    drivers.Add(Adapt_rep6_Driver.mapDrivers[int.Parse(this.map[$"drivers[{i}]"])] as IDriver);
+                }
+                return drivers;
+            }
+        }
     }
 
     public class Adapt_rep6_Bytebus : Adapt_rep6_Vehicle, IBytebus
@@ -393,6 +428,21 @@ namespace BTM
             {
                 int len = int.Parse(driver.Map["vehicles.Size()"]);
                 List<IVehicle> vehicles = new List<IVehicle>();
+                for (int i = 0; i < len; i++)
+                {
+                    vehicles.Add((Adapt_rep6_Vehicle.vehiclesMap[int.Parse(driver.Map[$"vehicles[{i}]"])]));
+                }
+                return vehicles;
+            }
+
+        }
+
+        public List<Adapt_rep6_Vehicle> GetAdaptVehicles
+        {
+            get
+            {
+                int len = int.Parse(driver.Map["vehicles.Size()"]);
+                List<Adapt_rep6_Vehicle> vehicles = new List<Adapt_rep6_Vehicle>();
                 for (int i = 0; i < len; i++)
                 {
                     vehicles.Add((Adapt_rep6_Vehicle.vehiclesMap[int.Parse(driver.Map[$"vehicles[{i}]"])]));

@@ -65,9 +65,11 @@ namespace BTM
         public abstract class Vehicle
         {
             public int id;
+            public List<int> drivers;
             public Vehicle(int id)
             {
                 this.id = id;
+                drivers = new List<int>();
             }
         }
 
@@ -119,6 +121,8 @@ namespace BTM
             public int name;
             public int surname;
             public int seniority;
+            public int id;
+            static int c_id = 0;
 
             public Driver(int name, int surname, int seniority, List<int> vehicles)
             {
@@ -126,6 +130,7 @@ namespace BTM
                 this.surname = surname;
                 this.seniority = seniority;
                 this.vehicles = vehicles;
+                this.id = c_id++;
             }
 
             /*
@@ -152,6 +157,7 @@ namespace BTM
         public Rep4.Line line;
 
         public static Dictionary<int, Adapt_rep4_Line> linesMap = new Dictionary<int, Adapt_rep4_Line>();
+
 
         
         public Adapt_rep4_Line(string numberHex, int numberDec, string commonName, List<Adapt_rep4_Stop> stops = null, List<Adapt_rep4_Stop> vehicles = null)
@@ -181,6 +187,10 @@ namespace BTM
             linesMap[numberDec] = this;
 
         }
+
+      
+
+        
 
         public int NumberDec
         {
@@ -263,6 +273,12 @@ namespace BTM
                 }
             }
         }
+
+        public override string ToString()
+        {
+            string s = $"{this.NumberDec}, {this.CommonName}";
+            return s;
+        }
     }
 
     public class Adapt_rep4_Stop : IStop
@@ -321,6 +337,8 @@ namespace BTM
                 Rep4.Map[stop.type] = value;
             }
         }
+
+
         public List<ILine> Lines
         {
             get
@@ -351,12 +369,49 @@ namespace BTM
     {
         public static Dictionary<int, Adapt_rep4_Vehicle> vehiclesMap = new Dictionary<int, Adapt_rep4_Vehicle>();
         private int _id;
+        private List<int> _drivers;
 
         public Adapt_rep4_Vehicle(int id)
         {
             _id = id.ToString().GetHashCode();
             Rep4.Map[_id] = id.ToString();
+            _drivers = new List<int>();
         }
+        public void AddDriver(Adapt_rep4_Driver d)
+        {
+            _drivers.Add(d.Id);
+        }
+
+        public List<IDriver> Drivers
+        {
+            get
+            {
+                List<IDriver> list = new List<IDriver>();
+                if (this._drivers == null) return list;
+
+                foreach (var s in _drivers)
+                {
+                    list.Add(Adapt_rep4_Driver.mapDrivers[s]);
+                }
+                return list;
+            }
+        }
+
+        public List<Adapt_rep4_Driver> GetAdaptDrivers
+        {
+            get
+            {
+                List<Adapt_rep4_Driver> list = new List<Adapt_rep4_Driver>();
+                if (this._drivers == null) return list;
+
+                foreach (var s in _drivers)
+                {
+                    list.Add(Adapt_rep4_Driver.mapDrivers[s]);
+                }
+                return list;
+            }
+        }
+
         public int Id { get => int.Parse(Rep4.Map[_id]); set { _id = value.ToString().GetHashCode(); Rep4.Map[_id] = value.ToString(); } }
     }
     public class Adapt_rep4_Bytebus : Adapt_rep4_Vehicle, IBytebus
@@ -455,7 +510,7 @@ namespace BTM
     public class Adapt_rep4_Driver : IDriver
     {
         public Rep4.Driver driver;
-        //public static Dictionary<int, Adapt_rep4_Driver> mapDrivers = new Dictionary<int, Adapt_rep4_Driver>();
+        public static Dictionary<int, Adapt_rep4_Driver> mapDrivers = new Dictionary<int, Adapt_rep4_Driver>();
 
         public Adapt_rep4_Driver(Rep4.Driver driver)
         {
@@ -478,6 +533,15 @@ namespace BTM
                 }
                 
             }
+
+            Rep4.Map[driver.id] = driver.id.ToString();
+            mapDrivers[driver.id] = this;
+        }
+
+        public int Id
+        {
+            get => int.Parse(Rep4.Map[driver.id]);
+            
         }
 
         public int Seniority
@@ -529,6 +593,22 @@ namespace BTM
                 return list;
             }
         }
+
+        public List<Adapt_rep4_Vehicle> GetAdaptVehicles
+        {
+            get
+            {
+                List<Adapt_rep4_Vehicle> list = new List<Adapt_rep4_Vehicle>();
+                if (this.driver.vehicles == null) return list;
+
+                foreach (var v in driver.vehicles)
+                {
+                    list.Add(Adapt_rep4_Vehicle.vehiclesMap[v]);
+                }
+                return list;
+            }
+        }
+
         public List<Adapt_rep4_Vehicle> SetVehicles
         {
             set
