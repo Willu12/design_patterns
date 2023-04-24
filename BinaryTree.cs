@@ -41,7 +41,7 @@ namespace BTM.Tree
             while(p.Left != null && p.Right != null)
             {
                 rand++;
-                if (rand % 1 == 0) p = p.Left;
+                if (rand % 2 == 0) p = p.Left;
                 else p = p.Right;
             }
             if (p.Left == null)
@@ -54,6 +54,17 @@ namespace BTM.Tree
             }
         }
 
+        public bool Delete(Iiterator<T> iterator)
+        {
+            T item = iterator.currentItem();
+            iterator.Next();
+
+            if (Delete(item)) return true;
+
+            return false;
+
+        }
+
         public bool Delete(T obj)
         {
             if(Root == null) return false;
@@ -62,6 +73,7 @@ namespace BTM.Tree
 
             while(iterator.isDone() == false)
             {
+                if (iterator.currentItem() == null) return false;
                 if(iterator.currentItem().Equals(obj))
                 {
                     break;
@@ -74,9 +86,14 @@ namespace BTM.Tree
 
             Node<T> q = iterator.node;
             Node<T> p = iterator.node;
+            if (p == null) return false;
             //find with empty children
-            while (p.Left == null && p.Right == null)
+            while (p.Left != null && p.Right != null)
             {
+                if(p.Left == null)
+                {
+                    p = p.Right;
+                }
                 p = p.Left;
             }
 
@@ -163,6 +180,7 @@ namespace BTM.Tree
 
         public T currentItem()
         {
+            if (node == null) return default(T);
             return node.V;
         }
 

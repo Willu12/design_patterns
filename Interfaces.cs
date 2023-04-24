@@ -73,4 +73,24 @@ namespace BTM
         bool isDone();
         T currentItem();
     }
+
+    public interface IComparer<T>
+    {
+        int checkSign(string sign);
+        bool compare(T? x, T? y);
+    }
+    public interface ICommand
+    {
+        void execute();
+    }
+
+    public interface ICommandList : ICommand
+    {
+        String listCollections();
+    }
+
+    public interface ICommandFind : ICommand
+    {
+        string filteredCollections();
+    }
 }

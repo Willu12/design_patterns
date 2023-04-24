@@ -5,7 +5,6 @@ using System.Runtime.CompilerServices;
 using System;
 using System.Collections.Generic;
 using static BTM.Rep0;
-using static BTM.Rep0;
 
 //Console.WriteLine("Hello, World!");
 using System.Security.AccessControl;
@@ -29,10 +28,6 @@ namespace BTM
             L023 = new Rep0.Line(17.ToString(), 23, "Isengard - Mordor");
             L014 = new Rep0.Line("E", 14, "Museum of Plant");
 
-            //List<Rep0.Line> ListL016 = new List<Rep0.Line> { L016};
-            //List<Rep0.Line> ListL023 = new List<Rep0.Line>();
-            //int[] p = [23,23,23];
-            //ListL023.Add(L023);
             S01 = new Rep0.Stop(1, "SPIR - V", "bus", new List<Rep0.Line> { L016 });
             S02 = new Rep0.Stop(2, "GLSL", "tram", new List<Rep0.Line> { L016 });
             S03 = new Rep0.Stop(3, "HLSL", "other", new List<Rep0.Line> { L016 });
@@ -46,7 +41,6 @@ namespace BTM
             L016.setStops = new List<Rep0.Stop> { S01, S02, S03, S08 };
             L023.setStops = new List<Rep0.Stop> { S04, S05, S06, S07 };
             L014.setStops = new List<Rep0.Stop> { S07, S08, S09 };
-
 
             Rep0.Bytebus B011 = new Rep0.Bytebus(11, null, "Byte5");
             Rep0.Bytebus B012 = new Rep0.Bytebus(12, null, "bisel20");
@@ -211,6 +205,13 @@ namespace BTM
                 }
             }
 
+
+            BinaryTree<ILine> lines = new BinaryTree<ILine>(new List<ILine>(lines0));
+            BinaryTree<IVehicle> vehicles = new BinaryTree<IVehicle>(new List<IVehicle>(vehicles0));
+            BinaryTree<IStop> stops = new BinaryTree<IStop>(new List<IStop>(stops0));
+            BinaryTree<IDriver> drivers = new BinaryTree<IDriver>(new List<IDriver>(drivers0));
+
+
             #endregion rep4
 
             Func<ILine,bool> pred = Algorithms.f;
@@ -218,6 +219,7 @@ namespace BTM
             BinaryTree<ILine> binaryTreeLines0 = new BinaryTree<ILine>(new List<ILine>(lines0));
             Vector<ILine> vectorLines = new Vector<ILine>(new List<ILine>(lines0));
 
+            /*
             Console.WriteLine("reprezentacja 0");
             //PrintTask(new List<ILine>(lines0), new List<IDriver>(drivers0));
             //Print<ILine>(biLines0, f);
@@ -228,8 +230,86 @@ namespace BTM
             Console.WriteLine("\n\nreprezentacja 4");
             //PrintTask(new List<ILine>(lines4), new List<IDriver>(drivers4));
 
-            Console.WriteLine(Algorithms.Find<ILine>(binaryTreeLines0.CreateReverseIterator(), new Predicate()));
+            //Console.WriteLine(Algorithms.Find<ILine>(binaryTreeLines0.CreateReverseIterator(), new Predicate()));
             Algorithms.ForEach<ILine>(binaryTreeLines0.CreateReverseIterator(), new Function());
+            Console.WriteLine("po zmianie");
+
+            binaryTreeLines0.Delete(L023);
+            binaryTreeLines0.Add(L016);
+            Algorithms.ForEach<ILine>(binaryTreeLines0.CreateReverseIterator(), new Function());
+            */
+
+
+            while(true)
+            {
+                string? command_line = Console.ReadLine();
+                if (command_line == null) break;
+                if (command_line.ToLower() == "exit") break;
+
+                string[] words = command_line.Split(' ');
+
+
+                ICommand command = null;
+                switch(words[0])
+                {
+                    case "list":
+                        {
+                            
+                            switch (words[1])
+                            {
+                                
+                                case "lines":
+                                    command = new CollectionAdder<ILine>(lines, new basicCommandList());
+                                    break;
+                                case "stops":
+                                    command = new CollectionAdder<IStop>(stops, new basicCommandList());
+                                    break;
+                                case "vehicles":
+                                    command = new CollectionAdder<IVehicle>(vehicles, new basicCommandList());
+                                    break;
+                                case "drivers":
+                                    command = new CollectionAdder<IDriver>(drivers, new basicCommandList());
+                                    break;
+                                default:
+                                    Console.WriteLine("incorrect items to print");
+                                    break;
+
+                            }
+
+                            break;
+                        }
+                    case "find":
+                        {
+                            switch (words[1])
+                            {
+
+                                case "lines":
+                                    command = new CommandFindLines(new basicCommandFind(), lines, words[3], words[2], words[4]);
+                                    break;
+                                case "stops":
+                                    command = new CommandFindStops(new basicCommandFind(), stops, words[3], words[2], words[4]);
+                                    break;
+                                case "vehicles":
+                                    command = new CommandFindVehicles(new basicCommandFind(), vehicles, words[3], words[2], words[4]);
+                                    break;
+                                case "drivers":
+                                    command = new CommandFindDrivers(new basicCommandFind(), drivers, words[3], words[2], words[4]);
+                                    break;
+                                default:
+                                    Console.WriteLine("incorrect items to print");
+                                    break;
+
+                            }
+                            break;
+                        }
+                    default:
+                        Console.WriteLine("This command does not exist");
+                        break;
+                }
+                if (command != null) command.execute();
+            }
+
+            Console.WriteLine("Terminating...");
             return;
         }
     }

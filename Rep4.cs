@@ -41,25 +41,7 @@ namespace BTM
                 this.lines = lines;
             }
 
-            /*
-            public Stop(int id, string name, string type, List<Line> lines = null)
-            {
-                this.name = name.GetHashCode();
-                //Map.Add(id.GetHashCode(), id.ToString());
-                if (Map.ContainsKey(type.GetHashCode()) == false) Map.Add(type.GetHashCode(), type);
-                if (Map.ContainsKey(name.GetHashCode()) == false) Map.Add(name.GetHashCode(), type);
-
-                this.id = id;
-                this.type = type.GetHashCode();
-                this.linesIds = new List<int>();
-
-                foreach (var l in lines)
-                {
-                    this.linesIds.Add(l.NumberDec);
-                }
-
-            }
-            */
+            
         }
 
         public abstract class Vehicle

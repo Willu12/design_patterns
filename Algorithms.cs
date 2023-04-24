@@ -71,10 +71,31 @@ namespace BTM
         {
             while (iterator.isDone() == false)
             {
-                Fun.f((T)iterator.currentItem());
+                Fun.f(iterator.currentItem());
                 iterator.Next();
             }
+        }
 
+        public static string ForEachToString<T>(Iiterator<T> iterator, Func<T,string> func)
+        {
+            string s = "";
+            while (iterator.isDone() == false)
+            {
+                s += func(iterator.currentItem());
+                iterator.Next();
+            }
+            return s;
+        }
+
+        public static string ForEachIfToString<T>(Iiterator<T> iterator, Func<T, bool> func)
+        {
+            string s = "";
+            while (iterator.isDone() == false)
+            {
+                if (func(iterator.currentItem())) s += iterator.currentItem().ToString() + '\n';
+                iterator.Next();
+            }
+            return s;
         }
 
         public static int CountIf<T>(Iiterator<T> iterator, IPredicate<T> pred)

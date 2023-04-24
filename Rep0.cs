@@ -39,7 +39,7 @@ namespace BTM
 
             public override string ToString()
             {
-                string s = $"{_numberHex}, {numberDec}, Stops: [";
+                string s = $"{_numberHex}, {numberDec}, {commonName}, Stops: [";
                 foreach (Stop stop in stops)
                 {
                     s += $" {stop.Id}";

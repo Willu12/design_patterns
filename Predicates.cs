@@ -26,6 +26,15 @@ namespace BTM
         }
     }
 
+
+    public class PrintFunction<T> : IFunction<T>
+    {
+        public void f(T item)
+        {
+            Console.WriteLine(item);
+        }
+    }
+
     public class Function : IFunction<ILine>
     {
         public void f(ILine line)
