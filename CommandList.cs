@@ -1,67 +1,68 @@
 ﻿using System;
 namespace BTM
 {
-    public class basicCommandList : ICommandList
+    public class CommandList : ICommand
     {
-        public void execute()
+        private DataStorer _dataStorer;
+        private Dictionary<string, ICollectionPrinter> collectionPrintersMap;
+
+        public DataStorer DataStorer { get => _dataStorer; set => _dataStorer = value;}
+
+        public CommandList(DataStorer data)
         {
-            Console.WriteLine(this.listCollections());
+            this.DataStorer = data;
+            createCollectionPrintersMap();
         }
 
-        public string listCollections()
+        public void execute(string commandLine)
         {
-            return "";
+            string[] collectionNames = GetValuesFromString(commandLine);
+
+            foreach(string collectionName in collectionNames)
+            {
+                if (collectionPrintersMap.ContainsKey(collectionName) == false)
+                {
+                    Console.WriteLine($"collection \"{collectionName}\" doesn't exist");
+                    return;
+                }
+                ICollectionPrinter collectionPrinter = collectionPrintersMap[collectionName];
+                collectionPrinter.printCollection();
+            }
+        }
+
+        private void createCollectionPrintersMap()
+        {
+            collectionPrintersMap = new Dictionary<string, ICollectionPrinter>();
+
+            collectionPrintersMap["lines"] = new CollectionPrinter<ILine>(DataStorer.lines);
+            collectionPrintersMap["stops"] = new CollectionPrinter<IStop>(DataStorer.stops);
+            collectionPrintersMap["drivers"] = new CollectionPrinter<IDriver>(DataStorer.drivers);
+            collectionPrintersMap["bytebuses"] = new CollectionPrinter<IBytebus>(DataStorer.bytebuses);
+            collectionPrintersMap["trams"] = new CollectionPrinter<ITram>(DataStorer.trams);
+        }
+
+        private string[] GetValuesFromString(string commandLine)
+        { 
+            if (commandLine.StartsWith("list ")) commandLine = commandLine.Substring("list ".Length);
+            return commandLine.Split(' ');
         }
     }
-
-    public abstract class commandListDecorator : ICommandList
+    public class CollectionPrinter<T> : ICollectionPrinter
     {
-        protected ICommandList commandList;
+        private ICollection<T> collection;
 
-        public commandListDecorator(ICommandList commandList)
-        {
-            this.commandList = commandList;
-        }
-
-        public virtual void execute()
-        {
-            commandList.execute();
-        }
-
-        public virtual string listCollections()
-        {
-            return commandList.listCollections();
-        }
-    }
-
-    public class CollectionAdder<T> : commandListDecorator
-    {
-        ICollection<T> collection;
-        public CollectionAdder(ICollection<T> collection,ICommandList commandList) : base(commandList)
+        public CollectionPrinter(ICollection<T> collection)
         {
             this.collection = collection;
         }
 
-        public  override string listCollections()
+        public void printCollection()
         {
-            string s = commandList.listCollections();
             Func<T, string> func = item => item.ToString() + '\n';
-            s += Algorithms.ForEachToString<T>(collection.CreateForwardIterator(), func);
-
-            return s;
-        }
-
-        public override void execute()
-        {
-            Console.WriteLine(this.listCollections());
+            string s = Algorithms.ForEachToString<T>(collection.CreateForwardIterator(), func);
+            Console.WriteLine(s);
         }
     }
-
-
-
-
-
-
 
 }
 

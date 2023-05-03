@@ -4,6 +4,7 @@
 using System.Runtime.CompilerServices;
 using System;
 using System.Collections.Generic;
+
 using static BTM.Rep0;
 
 //Console.WriteLine("Hello, World!");
@@ -66,6 +67,9 @@ namespace BTM
             List<Rep0.Stop> stops0 = new List<Rep0.Stop> { S01, S02, S03, S04, S05, S06, S07, S08, S09 };
             List<Rep0.Vehicle> vehicles0 = new List<Rep0.Vehicle> { B011, B012, B013, B014, B015, T021, T022, T023 };
             List<Rep0.Driver> drivers0 = new List<Rep0.Driver> { D01, D02, D03 };
+            List<Rep0.Bytebus> bytebuses0 = new List<Rep0.Bytebus> { B011, B012, B013, B014,B015 };
+            List<Rep0.Tram> trams0 = new List<Rep0.Tram> { T021,T022,T023 };
+
 
             L016.setVehicles = new List<Rep0.Vehicle> { B011, B012, B013 };
             L023.setVehicles = new List<Rep0.Vehicle> { B011, B014, B015 };
@@ -80,11 +84,13 @@ namespace BTM
             }
 
             #endregion rep0
+
+            #region rep6
             ////////////////////////
             // reprezenatcja 6//
             ////////////////////////////
             ///
-            # region rep6
+
             Adapt_rep6_Line A6L_16, A6L_23, A6L_14;
             Adapt_rep6_Stop A6S_1, A6S_2, A6S_3, A6S_4, A6S_5, A6S_6, A6S_7, A6S_8, A6S_9;
 
@@ -92,10 +98,6 @@ namespace BTM
             A6L_23 = new(17.ToString(), 23, "Isengard - Mordor");
             A6L_14 = new("E", 14, "Museum of Plant");
 
-            //List<Rep0.Line> ListL016 = new List<Rep0.Line> { L016};
-            //List<Rep0.Line> ListL023 = new List<Rep0.Line>();
-            //int[] p = [23,23,23];
-            //ListL023.Add(L023);
             A6S_1 = new(1, "SPIR - V", "bus", new List<Adapt_rep6_Line> { A6L_16 });
             A6S_2 = new(2, "GLSL", "tram", new List<Adapt_rep6_Line> { A6L_16 });
             A6S_3 = new(3, "HLSL", "other", new List<Adapt_rep6_Line> { A6L_16 });
@@ -110,14 +112,11 @@ namespace BTM
             A6L_23.SetStops = new List<Adapt_rep6_Stop> { A6S_4, A6S_5, A6S_6, A6S_7 };
             A6L_14.SetStops = new List<Adapt_rep6_Stop> { A6S_7, A6S_8, A6S_9 };
 
-
             Adapt_rep6_Bytebus A6B_11 = new(11, new List<Adapt_rep6_Line> { A6L_16, A6L_23 }, "Byte5");
             Adapt_rep6_Bytebus A6B_12 = new(12, new List<Adapt_rep6_Line> { A6L_16 }, "bisel20");
             Adapt_rep6_Bytebus A6B_13 = new(13, new List<Adapt_rep6_Line> { A6L_16 }, "bisel20");
             Adapt_rep6_Bytebus A6B_14 = new(14, new List<Adapt_rep6_Line> { A6L_23, A6L_14 }, "gibgaz");
             Adapt_rep6_Bytebus A6B_15 = new(15, new List<Adapt_rep6_Line> { A6L_23 }, "gibgaz");
-
-
 
             Adapt_rep6_Tram A6T_21 = new(21, 1, A6L_14);
             Adapt_rep6_Tram A6T_22 = new(22, 2, A6L_14);
@@ -153,10 +152,6 @@ namespace BTM
             A4L_23 = new(17.ToString(), 23, "Isengard - Mordor");
             A4L_14 = new("E", 14, "Museum of Plant");
 
-            //List<Rep0.Line> ListL016 = new List<Rep0.Line> { L016};
-            //List<Rep0.Line> ListL023 = new List<Rep0.Line>();
-            //int[] p = [23,23,23];
-            //ListL023.Add(L023);
             A4S_1 = new(1, "SPIR - V", "bus", new List<Adapt_rep4_Line> { A4L_16 });
             A4S_2 = new(2, "GLSL", "tram", new List<Adapt_rep4_Line> { A4L_16 });
             A4S_3 = new(3, "HLSL", "other", new List<Adapt_rep4_Line> { A4L_16 });
@@ -171,14 +166,11 @@ namespace BTM
             A4L_23.SetStops = new List<Adapt_rep4_Stop> { A4S_4, A4S_5, A4S_6, A4S_7 };
             A4L_14.SetStops = new List<Adapt_rep4_Stop> { A4S_7, A4S_8, A4S_9 };
 
-
             Adapt_rep4_Bytebus A4B_11 = new(11, new List<Adapt_rep4_Line> { A4L_16, A4L_23 }, "Byte5");
             Adapt_rep4_Bytebus A4B_12 = new(12, new List<Adapt_rep4_Line> { A4L_16 }, "bisel20");
             Adapt_rep4_Bytebus A4B_13 = new(13, new List<Adapt_rep4_Line> { A4L_16 }, "bisel20");
             Adapt_rep4_Bytebus A4B_14 = new(14, new List<Adapt_rep4_Line> { A4L_23, A4L_14 }, "gibgaz");
             Adapt_rep4_Bytebus A4B_15 = new(15, new List<Adapt_rep4_Line> { A4L_23 }, "gibgaz");
-
-
 
             Adapt_rep4_Tram A4T_21 = new(21, 1, A4L_14);
             Adapt_rep4_Tram A4T_22 = new(22, 2, A4L_14);
@@ -205,110 +197,58 @@ namespace BTM
                 }
             }
 
-
             BinaryTree<ILine> lines = new BinaryTree<ILine>(new List<ILine>(lines0));
             BinaryTree<IVehicle> vehicles = new BinaryTree<IVehicle>(new List<IVehicle>(vehicles0));
             BinaryTree<IStop> stops = new BinaryTree<IStop>(new List<IStop>(stops0));
             BinaryTree<IDriver> drivers = new BinaryTree<IDriver>(new List<IDriver>(drivers0));
+            BinaryTree<IBytebus> bytebuses = new BinaryTree<IBytebus>(new List<IBytebus>(bytebuses0));
+            BinaryTree<ITram> trams = new BinaryTree<ITram>(new List<ITram>(trams0));
 
-
-            #endregion rep4
-
-            Func<ILine,bool> pred = Algorithms.f;
+            Func<ILine, bool> pred = Algorithms.f;
             BiList<ILine> biLines0 = new BiList<ILine>(new List<ILine>(lines0));
             BinaryTree<ILine> binaryTreeLines0 = new BinaryTree<ILine>(new List<ILine>(lines0));
             Vector<ILine> vectorLines = new Vector<ILine>(new List<ILine>(lines0));
 
-            /*
-            Console.WriteLine("reprezentacja 0");
-            //PrintTask(new List<ILine>(lines0), new List<IDriver>(drivers0));
-            //Print<ILine>(biLines0, f);
+            DataStorer dataStorer = DataStorer.createDataStorer(lines, bytebuses, trams, drivers, stops);
+            #endregion rep4
 
-            Console.WriteLine("\n\nreprezentacja 6");
-           // PrintTask(new List<ILine>(lines6), new List<IDriver>(drivers6));
-
-            Console.WriteLine("\n\nreprezentacja 4");
-            //PrintTask(new List<ILine>(lines4), new List<IDriver>(drivers4));
-
-            //Console.WriteLine(Algorithms.Find<ILine>(binaryTreeLines0.CreateReverseIterator(), new Predicate()));
-            Algorithms.ForEach<ILine>(binaryTreeLines0.CreateReverseIterator(), new Function());
-            Console.WriteLine("po zmianie");
-
-            binaryTreeLines0.Delete(L023);
-            binaryTreeLines0.Add(L016);
-            Algorithms.ForEach<ILine>(binaryTreeLines0.CreateReverseIterator(), new Function());
-            */
+            #region createDataforCommands
+            string[] possibleTypes = new string[] { "lines", "stops", "bytebus", "trams", "drivers" };
+            List<String> possibleType = new List<String>(possibleTypes);
+            Dictionary<string, ICommand> commandMap = new Dictionary<string, ICommand>();
+            CommandList commandList = new CommandList(dataStorer);
+            CommandFind commandFind = new CommandFind(dataStorer);
+            CommandAdd commandAdd = new CommandAdd(dataStorer);
+            commandMap.Add("list",commandList);
+            commandMap.Add("find", commandFind);
+            commandMap.Add("add", commandAdd);
+            
+            //commandMap.Add("add",)
+            ICommand? command = null;
+            #endregion createDataforCommands
 
 
-            while(true)
+            while (true)
             {
-                string? command_line = Console.ReadLine();
-                if (command_line == null) break;
-                if (command_line.ToLower() == "exit") break;
+                string? commandLine = Console.ReadLine();
+                if (commandLine == null) continue;
+                string commandLIne = commandLine.ToLower();
+                string[] words = System.Text.RegularExpressions.Regex.Split(commandLine, "\"([^\"]*)\"|(\\s+)");
+                List<string> wordsList = new List<string>(words);
+                wordsList.RemoveAll(item => item ==" " || item =="");
+                words = wordsList.ToArray();
+                string commandName = words[0];
+                if (commandName == "exit") break;
 
-                string[] words = command_line.Split(' ');
-
-
-                ICommand command = null;
-                switch(words[0])
+                if (commandMap.ContainsKey(commandName) == false)
                 {
-                    case "list":
-                        {
-                            
-                            switch (words[1])
-                            {
-                                
-                                case "lines":
-                                    command = new CollectionAdder<ILine>(lines, new basicCommandList());
-                                    break;
-                                case "stops":
-                                    command = new CollectionAdder<IStop>(stops, new basicCommandList());
-                                    break;
-                                case "vehicles":
-                                    command = new CollectionAdder<IVehicle>(vehicles, new basicCommandList());
-                                    break;
-                                case "drivers":
-                                    command = new CollectionAdder<IDriver>(drivers, new basicCommandList());
-                                    break;
-                                default:
-                                    Console.WriteLine("incorrect items to print");
-                                    break;
-
-                            }
-
-                            break;
-                        }
-                    case "find":
-                        {
-                            switch (words[1])
-                            {
-
-                                case "lines":
-                                    command = new CommandFindLines(new basicCommandFind(), lines, words[3], words[2], words[4]);
-                                    break;
-                                case "stops":
-                                    command = new CommandFindStops(new basicCommandFind(), stops, words[3], words[2], words[4]);
-                                    break;
-                                case "vehicles":
-                                    command = new CommandFindVehicles(new basicCommandFind(), vehicles, words[3], words[2], words[4]);
-                                    break;
-                                case "drivers":
-                                    command = new CommandFindDrivers(new basicCommandFind(), drivers, words[3], words[2], words[4]);
-                                    break;
-                                default:
-                                    Console.WriteLine("incorrect items to print");
-                                    break;
-
-                            }
-                            break;
-                        }
-                    default:
-                        Console.WriteLine("This command does not exist");
-                        break;
+                    Console.WriteLine("Invalid Command");
+                    continue;
                 }
-                if (command != null) command.execute();
-            }
+                command = commandMap[commandName];
 
+                command.execute(commandLine.ToLower());
+            }
             Console.WriteLine("Terminating...");
             return;
         }

@@ -17,7 +17,7 @@ namespace BTM
     public interface IVehicle
     {
         int Id { get; set; }
-        List<IDriver> Drivers {get;}
+        List<IDriver> Drivers { get; }
     }
 
     public interface IStop
@@ -81,16 +81,45 @@ namespace BTM
     }
     public interface ICommand
     {
-        void execute();
+        void execute(string s);
+        DataStorer? DataStorer { get; set; }
     }
 
-    public interface ICommandList : ICommand
+    public interface ICollectionPrinter
     {
-        String listCollections();
+        void printCollection();
     }
 
-    public interface ICommandFind : ICommand
+    public interface ICollectionFilter
     {
-        string filteredCollections();
+        void printFilteredCollection(string field, int sign, string value);
+    }
+
+    public interface IItemAdder
+    {
+        void addItem(string representation);
+    }
+
+    public interface ILineCreator
+    {
+        ILine createLine(int numberDec, string numberHex, string commonName);
+    }
+
+    public interface IStopCreator
+    {
+        IStop createStop(int id, string name, string type);
+    }
+
+    public interface ITramCreator
+    {
+        ITram createTram(int id, int carsNumber);
+    }
+    public interface IBytebusCreator
+    {
+        IBytebus createBytebus(int id, string engineClass);
+    }
+    public interface IDriverCreator
+    {
+      IDriver createDriver(string name, string surname, int seniority);
     }
 }

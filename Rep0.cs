@@ -40,14 +40,21 @@ namespace BTM
             public override string ToString()
             {
                 string s = $"{_numberHex}, {numberDec}, {commonName}, Stops: [";
-                foreach (Stop stop in stops)
+                if(stops != null)
                 {
-                    s += $" {stop.Id}";
+                    foreach (Stop stop in stops)
+                    {
+                        s += $" {stop.Id}";
+                    }
                 }
+                
                 s += $" ],  Vehicles: [ ";
-                foreach (Vehicle veh in vehicles)
+                if(vehicles != null)
                 {
-                    s += $" {veh.Id}";
+                    foreach (Vehicle veh in vehicles)
+                    {
+                        s += $" {veh.Id}";
+                    }
                 }
                 s += " ]";
                 return s;
@@ -79,12 +86,17 @@ namespace BTM
 
             public override string ToString()
             {
-                string s = $"{name},{id}, type = {type}, lines: [";
-                foreach (Line line in lines)
+                string s = $"{name},{id}, type = {type}";
+                if(lines != null)
                 {
-                    s += $" {line.NumberDec}";
+                    s+= ", lines: [";
+                    foreach (Line line in lines)
+                    {
+                        s += $" {line.NumberDec}";
+                    }
+                    s += $"]";
                 }
-                s += $"]";
+               
                 return s;
             }
 
@@ -132,7 +144,10 @@ namespace BTM
             public override string ToString()
             {
                 string s = base.ToString();
-                s += $"EngineClass: {engineClass}, lines: [";
+                s += $"EngineClass: {engineClass}";
+
+                if (lines == null) return s;
+                s+= ", lines: [";
                 foreach (Line line in lines)
                 {
                     s += $" {line.NumberDec}";
@@ -162,7 +177,8 @@ namespace BTM
             public override string ToString()
             {
                 string s = base.ToString();
-                s += $" carsNumber: {carsNumber}, Line: {line.NumberDec}";
+                s += $" carsNumber: {carsNumber}";
+                if(line != null) s+= $", Line: {line.NumberDec}";
                 return s;
             }
         }
@@ -193,7 +209,9 @@ namespace BTM
 
             public override string ToString()
             {
-                string s = $"{name} {surname}, {seniority}, Vehicles: [";
+                string s = $"{name} {surname}, {seniority}";
+                if (vehicles == null) return s;
+                s += $", Vehicles: [";
                 foreach (Vehicle v in vehicles)
                 {
                     s += $" {v.Id}";

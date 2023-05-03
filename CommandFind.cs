@@ -1,230 +1,178 @@
 ﻿using System;
 namespace BTM
 {
-    public class basicCommandFind : ICommandFind
+    public class CommandFind : ICommand
     {
-        public void execute()
+        private DataStorer _dataStorer;
+        private Dictionary<string, ICollectionFilter> collectionFiltersMap;
+        private string collectionName;
+        private string field;
+        private int sign;
+        private string value;
+
+        public CommandFind(DataStorer dataStorer)
         {
-            Console.WriteLine(this.filteredCollections());
+            DataStorer = dataStorer;
+            createCollectionFiltersMap();
         }
 
-        public string filteredCollections()
+        public DataStorer DataStorer { get => _dataStorer; set => _dataStorer = value; }
+
+        public void execute(string commandLine)
         {
-            return "";
+            if (getValuesFromString(commandLine) == false) return;
+
+            if(collectionFiltersMap.ContainsKey(collectionName) == false)
+            {
+                Console.WriteLine("this collection doesnt exists");
+                return;
+            }
+            ICollectionFilter collectionFilter = collectionFiltersMap[collectionName];
+            collectionFilter.printFilteredCollection(field, sign, value);
+
         }
-    }
-
-    public abstract class CommandFindDecorator : ICommandFind
-    {
-        protected ICommandFind commandFind;
-
-        public CommandFindDecorator(ICommandFind commandFind)
+        private bool getValuesFromString(string commandLine)
         {
-            this.commandFind = commandFind;
+            if (commandLine.StartsWith("find ")) commandLine = commandLine.Substring("find ".Length);
+            string[] words = System.Text.RegularExpressions.Regex.Split(commandLine, "\"([^\"]*)\"|(\\s+)");
+            List<string> wordsList = new List<string>(words);
+            wordsList.RemoveAll(item => item == " " || item == "");
+            words = wordsList.ToArray();
+            if (words.Length != 4)
+            {
+                Console.WriteLine("Incorrect syntax for find command (find <name_of_the_class> <name_of_field>=|<|><value>)");
+                return false;
+            }
+            collectionName = words[0];
+            field = words[1];
+            sign = checkSign(words[2]);
+            value = words[3];
+            return true;
         }
 
-        public int checkSign(string sign)
+        private void createCollectionFiltersMap()
+        {
+            collectionFiltersMap = new Dictionary<string, ICollectionFilter>();
+
+            collectionFiltersMap["lines"] = new LineFilter(DataStorer.lines);
+            collectionFiltersMap["stops"] = new StopFilter(DataStorer.stops);
+            collectionFiltersMap["bytebuses"] = new BytebusFilter(DataStorer.bytebuses);
+            collectionFiltersMap["drivers"] = new DriverFilter(DataStorer.drivers);
+            collectionFiltersMap["trams"] = new TramFilter(DataStorer.trams);
+        }
+
+        private int checkSign(string sign)
         {
             if (sign == ">") return 1;
             if (sign == "<") return -1;
             return 0;
         }
-
-
-        public virtual void execute()
-        {
-            commandFind.execute();
-        }
-
-        public virtual string filteredCollections()
-        {
-            return commandFind.filteredCollections();
-        }
     }
 
-    public class CommandFindLines : CommandFindDecorator
+    public abstract class CollectionFilter<T> : ICollectionFilter
     {
-        private ICollection<ILine> collection;
-        private int sign;
-        private string field;
-        private string value;
-        private Func<ILine, string> f;
+        ICollection<T> collection;
+        public Dictionary<string, Func<T, string>> getFieldGettersMap;
 
-        public CommandFindLines(ICommandFind commandFind, ICollection<ILine> collection, string sign, string field, string value) : base(commandFind)
+        protected CollectionFilter(ICollection<T> collection)
         {
-            this.sign = checkSign(sign);
-            this.field = field;
-            this.value = value;
             this.collection = collection;
-            f = this.setfunction();
+            createFieldGetters();
         }
-
-        private Func<ILine, string> setfunction()
+        public void printFilteredCollection(string field, int sign, string value)
         {
-            switch (field)
+            if (getFieldGettersMap.ContainsKey(field) == false)
             {
-                case "numberdec":
-                    return x => x.NumberDec.ToString();
-                case "numberhex":
-                    return x => x.NumberHex.ToString();
-                case "commonName":
-                    return x => x.CommonName;
-                default:
-                    return x => x.CommonName;
+                Console.WriteLine("invalid field");
+                return;
             }
+            Func<T, string> getField = getFieldGettersMap[field];
+            Func<T, bool> comparer = item =>
+            {
+                string fieldValue = getField(item).ToLower();
+                int fieldvalueint = -1;
+                if (int.TryParse(fieldValue, out fieldvalueint))
+                {
+                    return fieldvalueint.CompareTo(int.Parse(value)) == sign;
+                }
+                return fieldValue.CompareTo(value) == sign;
+            };
+            string s = Algorithms.ForEachIfToString<T>(collection.CreateForwardIterator(), comparer);
+            Console.WriteLine(s);
+            if (s == "") Console.WriteLine("no items mathching criterias");
         }
 
-        public override string filteredCollections()
-        {
-            string s = commandFind.filteredCollections();
-            Func<ILine, bool> func = item => f(item).CompareTo(value) == sign;   
-            s += Algorithms.ForEachIfToString<ILine>(collection.CreateForwardIterator(), func);
-            if (s == "") return "Nothing has been found\n";
-            return s;
-        }
-
-        public override void execute()
-        {
-            Console.WriteLine(this.filteredCollections());
-        }
+        public abstract void createFieldGetters();
     }
 
-    public class CommandFindStops : CommandFindDecorator
+    public class LineFilter : CollectionFilter<ILine>
     {
-        private ICollection<IStop> collection;
-        private int sign;
-        private string field;
-        private string value;
-        private Func<IStop, string> f;
-
-        public CommandFindStops(ICommandFind commandFind, ICollection<IStop> collection, string sign, string field, string value) : base(commandFind)
+        public LineFilter(ICollection<ILine> collection) : base(collection)
+        {}
+        public override void createFieldGetters()
         {
-            this.sign = checkSign(sign);
-            this.field = field;
-            this.value = value;
-            this.collection = collection;
-            f = this.setfunction();
-        }
+            getFieldGettersMap = new Dictionary<string, Func<ILine, string>>();
 
-        private Func<IStop, string> setfunction()
-        {
-            switch (field)
-            {
-                case "id":
-                    return x => x.Id.ToString();
-                case "name":
-                    return x => x.Name;
-                case "type":
-                    return x => x.Type;
-                default:
-                    return x => x.Id.ToString();
-            }
-        }
-
-        public override string filteredCollections()
-        {
-            string s = commandFind.filteredCollections();
-            Func<IStop, bool> func = item => f(item).CompareTo(value) == sign;
-            s += Algorithms.ForEachIfToString<IStop>(collection.CreateForwardIterator(), func);
-            if (s == "") return "Nothing has been found\n";
-            return s;
-        }
-
-        public override void execute()
-        {
-            Console.WriteLine(this.filteredCollections());
+            getFieldGettersMap["commonname"] = new Func<ILine, string>(x => x.CommonName);
+            getFieldGettersMap["numberdec"] = new Func<ILine, string>(x => x.NumberDec.ToString());
+            getFieldGettersMap["numberhex"] = new Func<ILine, string>(x => x.NumberHex);
         }
     }
 
-    public class CommandFindDrivers : CommandFindDecorator
+    public class StopFilter : CollectionFilter<IStop>
     {
-        private ICollection<IDriver> collection;
-        private int sign;
-        private string field;
-        private string value;
-        private Func<IDriver, string> f;
+        public StopFilter(ICollection<IStop> collection) : base(collection)
+        { }
 
-        public CommandFindDrivers(ICommandFind commandFind, ICollection<IDriver> collection, string sign, string field, string value) : base(commandFind)
+        public override void createFieldGetters()
         {
-            this.sign = checkSign(sign);
-            this.field = field;
-            this.value = value;
-            this.collection = collection;
-            f = this.setfunction();
-        }
+            getFieldGettersMap = new Dictionary<string, Func<IStop, string>>();
 
-        private Func<IDriver, string> setfunction()
-        {
-            switch (field)
-            {
-                case "name":
-                    return x => x.Name;
-                case "surname":
-                    return x => x.Surname;
-                case "seniority":
-                    return x => x.Seniority.ToString();
-                default:
-                    return x => x.Name;
-            }
-        }
-
-        public override string filteredCollections()
-        {
-            string s = commandFind.filteredCollections();
-            Func<IDriver, bool> func = item => f(item).CompareTo(value) == sign;
-            s += Algorithms.ForEachIfToString<IDriver>(collection.CreateForwardIterator(), func);
-            if (s == "") return "Nothing has been found\n";
-            return s;
-        }
-
-        public override void execute()
-        {
-            Console.WriteLine(this.filteredCollections());
+            getFieldGettersMap["id"] = new Func<IStop, string>(x => x.Id.ToString());
+            getFieldGettersMap["name"] = new Func<IStop, string>(x => x.Name);
+            getFieldGettersMap["type"] = new Func<IStop, string>(x => x.Type);
         }
     }
 
-    public class CommandFindVehicles : CommandFindDecorator
+    public class DriverFilter : CollectionFilter<IDriver>
     {
-        private ICollection<IVehicle> collection;
-        private int sign;
-        private string field;
-        private string value;
-        private Func<IVehicle, string> f;
+        public DriverFilter(ICollection<IDriver> collection) : base(collection)
+        { }
 
-        public CommandFindVehicles(ICommandFind commandFind, ICollection<IVehicle> collection, string sign, string field, string value) : base(commandFind)
+        public override void createFieldGetters()
         {
-            this.sign = checkSign(sign);
-            this.field = field;
-            this.value = value;
-            this.collection = collection;
-            f = this.setfunction();
-        }
+            getFieldGettersMap = new Dictionary<string, Func<IDriver, string>>();
 
-        private Func<IVehicle, string> setfunction()
-        {
-            switch (field)
-            {
-                case "id":
-                    return x => x.Id.ToString();
-                default:
-                    return x => x.Id.ToString();
-            }
-        }
-
-        public override string filteredCollections()
-        {
-            string s = commandFind.filteredCollections();
-            Func<IVehicle, bool> func = item => f(item).CompareTo(value) == sign;
-            s += Algorithms.ForEachIfToString<IVehicle>(collection.CreateForwardIterator(), func);
-            if (s == "") return "Nothing has been found\n";
-            return s;
-        }
-
-        public override void execute()
-        {
-            Console.WriteLine(this.filteredCollections());
+            getFieldGettersMap["seniority"] = new Func<IDriver, string>(x => x.Seniority.ToString());
+            getFieldGettersMap["name"] = new Func<IDriver, string>(x => x.Name);
+            getFieldGettersMap["surname"] = new Func<IDriver, string>(x => x.Surname);
         }
     }
 
+    public class BytebusFilter : CollectionFilter<IBytebus>
+    {
+        public BytebusFilter(ICollection<IBytebus> collection) : base(collection)
+        { }
+        public override void createFieldGetters()
+        {
+            getFieldGettersMap = new Dictionary<string, Func<IBytebus, string>>();
+
+            getFieldGettersMap["id"] = new Func<IBytebus, string>(x => x.Id.ToString());
+            getFieldGettersMap["engineclass"] = new Func<IBytebus, string>(x => x.EngineClass);
+        }
+    }
+
+    public class TramFilter : CollectionFilter<ITram>
+    {
+        public TramFilter(ICollection<ITram> collection) : base(collection)
+        { }
+
+        public override void createFieldGetters()
+        {
+            getFieldGettersMap = new Dictionary<string, Func<ITram, string>>();
+
+            getFieldGettersMap["id"] = new Func<ITram, string>(x => x.Id.ToString());
+            getFieldGettersMap["engineclass"] = new Func<ITram, string>(x => x.CarsNumber.ToString());
+        }
+    }
 }
-

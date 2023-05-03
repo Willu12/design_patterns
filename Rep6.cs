@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Xml.Linq;
+
 namespace BTM
 {
     public class Rep6
@@ -242,6 +244,12 @@ namespace BTM
                 }
             }
         }
+
+        public override string ToString()
+        {
+            string s = $"{Name}, {Id}, type = {Type}";
+            return s;
+        }
     }
 
     public abstract class Adapt_rep6_Vehicle : IVehicle
@@ -282,6 +290,11 @@ namespace BTM
                 }
                 return drivers;
             }
+        }
+
+        public override string ToString()
+        {
+            return $"id = {Id}";
         }
     }
 
@@ -343,6 +356,13 @@ namespace BTM
                 }
             }
         }
+
+        public override string ToString()
+        {
+            string s = base.ToString();
+            s += $" EngineClass: {EngineClass}";
+            return s;
+        }
     }
     public class Adapt_rep6_Tram : Adapt_rep6_Vehicle, ITram
     {
@@ -359,7 +379,7 @@ namespace BTM
             Dictionary<string, string> map = new Dictionary<string, string>();
 
             map.Add("CarsNumber", carsNumber.ToString());
-            map.Add("line", line.NumberDec.ToString());
+            if(line != null) map.Add("line", line.NumberDec.ToString());
             this.tram = new Rep6.Tram(id, map);
             vehiclesMap[id] = this;
         }
@@ -382,6 +402,12 @@ namespace BTM
             {
                 tram.Map["line"] = value.NumberDec.ToString();
             }
+        }
+        public override string ToString()
+        {
+            string s = base.ToString();
+            s += $" carsNumber: {CarsNumber}";
+            return s;
         }
     }
 
@@ -454,6 +480,12 @@ namespace BTM
         public string Name { get => driver.Map["name"]; set => driver.Map["name"] = value; }
         public string Surname { get => driver.Map["surname"]; set => driver.Map["surname"] = value; }
         public int Seniority { get => int.Parse(driver.Map["seniority"]); set => driver.Map["seniority"] = value.ToString(); }
+
+        public override string ToString()
+        {
+            string s = $"{Name} {Surname}, {Seniority}";
+            return s;
+        }
     }
 }
 
