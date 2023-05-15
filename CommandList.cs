@@ -5,12 +5,15 @@ namespace BTM
     {
         private DataStorer _dataStorer;
         private Dictionary<string, ICollectionPrinter> collectionPrintersMap;
-
+        private List<string> words;
         public DataStorer DataStorer { get => _dataStorer; set => _dataStorer = value;}
+
+        
 
         public CommandList(DataStorer data)
         {
             this.DataStorer = data;
+            words = new List<string>();
             createCollectionPrintersMap();
         }
 
@@ -45,6 +48,28 @@ namespace BTM
         { 
             if (commandLine.StartsWith("list ")) commandLine = commandLine.Substring("list ".Length);
             return commandLine.Split(' ');
+        }
+
+        public bool checkcommandLine(string commandLine)
+        {
+            string[] words = GetValuesFromString(commandLine);
+
+            foreach(string word in words)
+            {
+                if (collectionPrintersMap.ContainsKey(word) == false) return false;
+            }
+            this.words = new List<string>(words);
+            return true;
+        }
+
+        public override string ToString()
+        {
+            string s = "Command List : ";
+            foreach(string word in words)
+            {
+                s += $"{word} ";
+            }
+            return s;
         }
     }
     public class CollectionPrinter<T> : ICollectionPrinter

@@ -6,12 +6,12 @@ namespace BTM
 {
     public class CommandAdd :ICommand
     {
-        private string representation;
-        private string type;
+        private string? representation;
+        private string? type;
         private DataStorer dataStorer;
         private Dictionary<string, ItemAdder> itemAddersMap;
 
-        public DataStorer? DataStorer { get => dataStorer; set => dataStorer = value; }
+        public DataStorer DataStorer { get => dataStorer; set => dataStorer = value; }
 
         public CommandAdd(DataStorer dataStorer)
         {
@@ -63,6 +63,22 @@ namespace BTM
             itemAddersMap["bytebus"] = new BytebusAdder(dataStorer);
             itemAddersMap["tram"] = new TramAdder(dataStorer);
             itemAddersMap["driver"] = new DriverAdder(dataStorer);
+        }
+
+        public bool checkcommandLine(string commandLine)
+        {
+            if (getValueFromCommandLine(commandLine) == false) return false;
+            if (itemAddersMap.ContainsKey(type) == false)
+            {
+                Console.WriteLine("invalid type");
+                return false;
+            }
+            return true;
+        }
+
+        public override string ToString()
+        {
+            return $"comamnd Add, {type} in {representation} representation";
         }
     }
 

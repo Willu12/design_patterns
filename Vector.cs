@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+
 namespace BTM
 {
 	public class Vector<T> : ICollection<T>
@@ -8,12 +10,33 @@ namespace BTM
 		private int _arrayLength;
 		private T[] _array;
 
+        public T this[int i]
+        {
+            get
+            {
+                if (i > Length || i < 0) throw new ArgumentOutOfRangeException();
+                return _array[i];
+            }
+            set
+            {
+                if (i > Length || i < 0) throw new ArgumentOutOfRangeException();
+                _array[i] = value;
+            }
+        }
+
 		public Vector(int length)
 		{
 			Length = length;
 			_arrayLength = 2 * length;
 			_array = new T[_arrayLength];
 		}
+
+        public Vector()
+        {
+            Length = 0;
+            _arrayLength = 1;
+            _array = new T[_arrayLength];
+        }
 
         public Vector(List<T> list) : this(list.Count)
         {
@@ -25,7 +48,6 @@ namespace BTM
 
         public int Length { get => _length; set => _length = value; }
 
-		public T this[int key] { get => _array[key]; set => _array[key] = value;}
         public void Add(T obj)
         {
             if(_arrayLength == Length)
@@ -64,6 +86,43 @@ namespace BTM
             return new ReverseVectorIterator<T>(this);
         }
 
+        List<T> toList()
+        {
+            List<T> list = new List<T>();
+            for(int i =0; i<Length; i++)
+            {
+                list.Add(this[i]);
+            }
+            return list;
+        }
+
+        bool divideByHalf()
+        {
+            if (Length * 4 > _arrayLength) return false;
+            List<T> list = this.toList();
+            Vector<T> newVector = new Vector<T>(list);
+            this._array = newVector._array;
+            this.Length = newVector.Length;
+            this._arrayLength = newVector._arrayLength;
+            return true;
+        }
+
+       
+        public bool popBack()
+        {
+            if (Length == 0) return false;
+
+            _array[Length] = default(T);
+            Length--;
+
+            if(_arrayLength >= 4 * Length)
+            {
+                divideByHalf();
+            }
+            return true;
+        }
+        
+
         public bool Delete(T obj)
         {
 			if (Length == 0) return false;
@@ -77,6 +136,16 @@ namespace BTM
 				return true;
 			}
 			return false;
+        }
+
+        public IEnumerator<T> GetEnumerator()
+        {
+            return CreateForwardIterator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 
@@ -92,9 +161,18 @@ namespace BTM
             this.i = 0;
         }
 
+        public T Current => throw new NotImplementedException();
+
+        object IEnumerator.Current => throw new NotImplementedException();
+
         public T currentItem()
         {
 			return vector[i];
+        }
+
+        public void Dispose()
+        {
+            vector = null;
         }
 
         public void First()
@@ -107,9 +185,20 @@ namespace BTM
 			return i >= vector.Length;
         }
 
+        public bool MoveNext()
+        {
+            Next();
+            return isDone();
+        }
+
         public void Next()
         {
 			i++;
+        }
+
+        public void Reset()
+        {
+            First();
         }
     }
 
@@ -124,9 +213,18 @@ namespace BTM
             this.i = vector.Length -1;
         }
 
+        public T Current => throw new NotImplementedException();
+
+        object IEnumerator.Current => throw new NotImplementedException();
+
         public T currentItem()
         {
             return vector[i];
+        }
+
+        public void Dispose()
+        {
+            vector = null;
         }
 
         public void First()
@@ -139,9 +237,20 @@ namespace BTM
             return i < 0;
         }
 
+        public bool MoveNext()
+        {
+            Next();
+            return isDone();
+        }
+
         public void Next()
         {
             i--;
+        }
+
+        public void Reset()
+        {
+            First();
         }
     }
 

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Collections;
 
 namespace BTM.Tree
 {
@@ -16,6 +17,11 @@ namespace BTM.Tree
         public BinaryTree(Node<T> root)
         {
             Root = root;
+        }
+
+        public BinaryTree()
+        {
+            Root = null;
         }
 
         public BinaryTree(List<T> list)
@@ -124,7 +130,15 @@ namespace BTM.Tree
             return new TreeReverseIterator<T>(this);
         }
 
+        public IEnumerator<T> GetEnumerator()
+        {
+            return CreateForwardIterator();
+        }
 
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
     }
 
     public class Node<T>
@@ -155,6 +169,10 @@ namespace BTM.Tree
         private Node<T>? prev;
         private Stack<Node<T>> _stack;
 
+        public T Current => node.V;
+
+        object IEnumerator.Current => node;
+
         public TreeForwardIterator(BinaryTree<T> tree)
         {
             _tree = tree;
@@ -165,7 +183,7 @@ namespace BTM.Tree
             PreOrder(tree.Root);
             if(isDone() == false)
             {
-                Next();
+               // Next();
             }
 
         }
@@ -183,8 +201,6 @@ namespace BTM.Tree
             if (node == null) return default(T);
             return node.V;
         }
-
-       
 
         public void First()
         {
@@ -206,12 +222,41 @@ namespace BTM.Tree
             }
             node = _stack.Pop();
         }
+
+        public bool MoveNext()
+        {
+            Next();
+            return !isDone();
+        }
+
+        public void Reset()
+        {
+            _stack.Clear();
+            this.node = _tree.Root;
+            _stack = new Stack<Node<T>>();
+
+            PreOrder(_tree.Root);
+            if (isDone() == false)
+            {
+                Next();
+            }
+        }
+
+        public void Dispose()
+        {
+            _stack.Clear();
+            node = null;
+        }
     }
     public class TreeReverseIterator<T> : Iiterator<T>
     {
         private BinaryTree<T> _tree;
         private Node<T>? node;
         private Stack<Node<T>> _stack;
+
+        public T Current => node.V;
+
+        object IEnumerator.Current => node;
 
         public TreeReverseIterator(BinaryTree<T> tree)
         {
@@ -260,6 +305,31 @@ namespace BTM.Tree
                 return;
             }
             node = _stack.Pop();
+        }
+
+        public bool MoveNext()
+        {
+            Next();
+            return !isDone();
+        }
+
+        public void Reset()
+        {
+            _stack.Clear();
+            this.node = _tree.Root;
+            _stack = new Stack<Node<T>>();
+
+            PostOrder(_tree.Root);
+            if (isDone() == false)
+            {
+                Next();
+            }
+        }
+
+        public void Dispose()
+        {
+            _stack.Clear();
+            node = null;
         }
     }
 }

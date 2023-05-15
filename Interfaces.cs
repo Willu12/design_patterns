@@ -47,7 +47,7 @@ namespace BTM
         int Seniority { get; set; }
     }
 
-    public interface ICollection<T>
+    public interface ICollection<T> : IEnumerable<T>
     {
         void Add(T obj);
         bool Delete(T obj);
@@ -66,7 +66,7 @@ namespace BTM
         public void f(T item);
     }
 
-    public interface Iiterator<T>
+    public interface Iiterator<T> : IEnumerator<T>
     {
         void First();
         void Next();
@@ -81,8 +81,9 @@ namespace BTM
     }
     public interface ICommand
     {
-        void execute(string s);
-        DataStorer? DataStorer { get; set; }
+        void execute(string s = "");
+       // DataStorer DataStorer { get; set; }
+        bool checkcommandLine(string commandLine);
     }
 
     public interface ICollectionPrinter
@@ -90,6 +91,15 @@ namespace BTM
         void printCollection();
     }
 
+    public interface IEditor<T>
+    {
+        void editItem(T item);
+    }
+
+    public interface ICollectionEditor
+    {
+        void editItem(string field, int sign, string value);
+    }
     public interface ICollectionFilter
     {
         void printFilteredCollection(string field, int sign, string value);

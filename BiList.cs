@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+
 namespace BTM
 {
     public class BiList<T> : ICollection<T>
@@ -81,6 +83,15 @@ namespace BTM
             return new ReverseBiListIterator<T>(this);
         }
 
+        public IEnumerator<T> GetEnumerator()
+        {
+            return new ForwardBiListIterator<T>(this);
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
     }
 
     public class Node<T>
@@ -112,9 +123,18 @@ namespace BTM
             _current = biList.Head;
         }
 
+        public T Current => currentItem();
+
+        object IEnumerator.Current => _current;
+
         public T currentItem()
         {
             return _current.V;
+        }
+
+        public void Dispose()
+        {
+            _current = null;
         }
 
         public void First()
@@ -127,9 +147,20 @@ namespace BTM
             return _current == null;
         }
 
+        public bool MoveNext()
+        {
+            Next();
+            return isDone();
+        }
+
         public void Next()
         {
             _current = _current.Next;
+        }
+
+        public void Reset()
+        {
+            _current = _biList.Head;
         }
     }
 
@@ -144,9 +175,18 @@ namespace BTM
             _current = biList.Tail;
         }
 
+        public T Current => currentItem();
+
+        object IEnumerator.Current => _current;
+
         public T currentItem()
         {
             return _current.V;
+        }
+
+        public void Dispose()
+        {
+            _current = null;
         }
 
         public void First()
@@ -159,9 +199,20 @@ namespace BTM
             return _current == null;
         }
 
+        public bool MoveNext()
+        {
+            Next();
+            return isDone();
+        }
+
         public void Next()
         {
             _current = _current.Prev;
+        }
+
+        public void Reset()
+        {
+            _current = _biList.Tail;
         }
     }
 }

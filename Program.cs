@@ -208,25 +208,33 @@ namespace BTM
             BiList<ILine> biLines0 = new BiList<ILine>(new List<ILine>(lines0));
             BinaryTree<ILine> binaryTreeLines0 = new BinaryTree<ILine>(new List<ILine>(lines0));
             Vector<ILine> vectorLines = new Vector<ILine>(new List<ILine>(lines0));
-
-            DataStorer dataStorer = DataStorer.createDataStorer(lines, bytebuses, trams, drivers, stops);
             #endregion rep4
 
             #region createDataforCommands
+            DataStorer dataStorer = DataStorer.createDataStorer(lines, bytebuses, trams, drivers, stops);
+            CommandQueue commandQueue = CommandQueue.getCommandQueue();
+
             string[] possibleTypes = new string[] { "lines", "stops", "bytebus", "trams", "drivers" };
             List<String> possibleType = new List<String>(possibleTypes);
             Dictionary<string, ICommand> commandMap = new Dictionary<string, ICommand>();
             CommandList commandList = new CommandList(dataStorer);
             CommandFind commandFind = new CommandFind(dataStorer);
             CommandAdd commandAdd = new CommandAdd(dataStorer);
+            CommandEdit commandEdit = new CommandEdit(dataStorer);
+            commandPrintQueue commandPrintQueue = new commandPrintQueue(commandQueue);
+            commandCommitQueue commandCommitQueue = new commandCommitQueue(commandQueue);
+            commandExportQueue commandExportQueue = new commandExportQueue(commandQueue);
             commandMap.Add("list",commandList);
             commandMap.Add("find", commandFind);
             commandMap.Add("add", commandAdd);
+            commandMap.Add("edit", commandEdit);
+            commandMap.Add("print", commandPrintQueue);
+            commandMap.Add("commit", commandCommitQueue);
+            commandMap.Add("export", commandExportQueue);
             
-            //commandMap.Add("add",)
+            
             ICommand? command = null;
             #endregion createDataforCommands
-
 
             while (true)
             {
@@ -238,6 +246,7 @@ namespace BTM
                 wordsList.RemoveAll(item => item ==" " || item =="");
                 words = wordsList.ToArray();
                 string commandName = words[0];
+                if (words[0] == "queue") commandName = words[1];
                 if (commandName == "exit") break;
 
                 if (commandMap.ContainsKey(commandName) == false)
@@ -247,7 +256,9 @@ namespace BTM
                 }
                 command = commandMap[commandName];
 
-                command.execute(commandLine.ToLower());
+
+                if(words[0] == "queue") command.execute(commandLine.ToLower());
+                else  commandQueue.addCommand(command, commandLine.ToLower());
             }
             Console.WriteLine("Terminating...");
             return;

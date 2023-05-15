@@ -14,7 +14,7 @@ namespace BTM
         public ICollection<IDriver> drivers;
         public ICollection<IStop> stops;
 
-        private static DataStorer instance;
+        private static DataStorer? instance;
 
         protected DataStorer(ICollection<ILine> lines, ICollection<IBytebus> bytebuses, ICollection<ITram> trams, ICollection<IDriver> drivers, ICollection<IStop> stops)
         {

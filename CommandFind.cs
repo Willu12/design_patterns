@@ -8,6 +8,7 @@ namespace BTM
         private string collectionName;
         private string field;
         private int sign;
+        private string signSymbol;
         private string value;
 
         public CommandFind(DataStorer dataStorer)
@@ -47,6 +48,7 @@ namespace BTM
             field = words[1];
             sign = checkSign(words[2]);
             value = words[3];
+            signSymbol = words[2];
             return true;
         }
 
@@ -67,25 +69,48 @@ namespace BTM
             if (sign == "<") return -1;
             return 0;
         }
+
+        public bool checkcommandLine(string commandLine)
+        {
+            if (getValuesFromString(commandLine) == false) return false;
+
+            if (collectionFiltersMap.ContainsKey(collectionName) == false)
+            {
+                Console.WriteLine("this collection doesnt exists");
+                return false;
+            }
+            return true;
+        }
+
+        public override string ToString()
+        {
+            return $"command Find, {collectionName} that {field} {signSymbol} {value}";
+        }
     }
 
     public abstract class CollectionFilter<T> : ICollectionFilter
     {
         ICollection<T> collection;
+        ICollection<T>? filteredCollection;
         public Dictionary<string, Func<T, string>> getFieldGettersMap;
+
+        public ICollection<T>? FilteredCollection { get => filteredCollection; set => filteredCollection = value; }
 
         protected CollectionFilter(ICollection<T> collection)
         {
             this.collection = collection;
             createFieldGetters();
         }
-        public void printFilteredCollection(string field, int sign, string value)
+
+
+        public void filterCollection(string field, int sign, string value)
         {
             if (getFieldGettersMap.ContainsKey(field) == false)
             {
                 Console.WriteLine("invalid field");
                 return;
             }
+
             Func<T, string> getField = getFieldGettersMap[field];
             Func<T, bool> comparer = item =>
             {
@@ -97,9 +122,22 @@ namespace BTM
                 }
                 return fieldValue.CompareTo(value) == sign;
             };
-            string s = Algorithms.ForEachIfToString<T>(collection.CreateForwardIterator(), comparer);
-            Console.WriteLine(s);
-            if (s == "") Console.WriteLine("no items mathching criterias");
+
+            ICollection<T> filteredCollection = Algorithms.ForEachFilter<T>(collection, comparer);
+            this.FilteredCollection = filteredCollection;
+
+        }
+        public void printFilteredCollection(string field, int sign, string value)
+        {
+            filterCollection(field, sign, value);
+            if(FilteredCollection == null || FilteredCollection.Count() == 0)
+            {
+                Console.WriteLine("no items matching criterias");
+                return;
+            }
+
+            CollectionPrinter<T> collectionPrinter = new CollectionPrinter<T>(FilteredCollection);
+            collectionPrinter.printCollection();
         }
 
         public abstract void createFieldGetters();

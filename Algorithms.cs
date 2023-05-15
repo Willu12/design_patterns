@@ -44,10 +44,9 @@ namespace BTM
 
             iterator.First();
 
-            while (iterator.isDone() == false)
+            while (iterator.MoveNext())
             {
                 if (pred(iterator.currentItem()) == true) return iterator.currentItem();
-                iterator.Next();
             }
             return default(T);
         }
@@ -56,33 +55,30 @@ namespace BTM
 
         public static T? Find<T>(Iiterator<T> iterator, IPredicate<T> pred) where T : class
         {
-            while (iterator.isDone() == false)
+            while (iterator.MoveNext())
             {
                 if (pred.eval(iterator.currentItem()))
                 {
                     return iterator.currentItem();
                 }
-                iterator.Next();
             }
             return null;
         }
 
         public static void ForEach<T>(Iiterator<T> iterator, IFunction<T> Fun)
         {
-            while (iterator.isDone() == false)
+            while (iterator.MoveNext())
             {
                 Fun.f(iterator.currentItem());
-                iterator.Next();
             }
         }
 
         public static string ForEachToString<T>(Iiterator<T> iterator, Func<T,string> func)
         {
             string s = "";
-            while (iterator.isDone() == false)
+            while (iterator.MoveNext())
             {
                 s += func(iterator.currentItem());
-                iterator.Next();
             }
             return s;
         }
@@ -90,21 +86,32 @@ namespace BTM
         public static string ForEachIfToString<T>(Iiterator<T> iterator, Func<T, bool> func)
         {
             string s = "";
-            while (iterator.isDone() == false)
+            while (iterator.MoveNext())
             {
                 if (func(iterator.currentItem())) s += iterator.currentItem().ToString() + '\n';
-                iterator.Next();
             }
             return s;
+        }
+
+        public static ICollection<T> ForEachFilter<T>(ICollection<T> collection, Func<T, bool> func)
+        {
+            BTM.Tree.BinaryTree<T> newCollection = new Tree.BinaryTree<T>();
+
+            Iiterator<T> iterator = collection.CreateForwardIterator();
+
+            while(iterator.MoveNext())
+            {
+                if (func(iterator.currentItem())) newCollection.Add(iterator.currentItem());
+            }
+            return newCollection;
         }
 
         public static int CountIf<T>(Iiterator<T> iterator, IPredicate<T> pred)
         {
             int sum = 0;
-            while (iterator.isDone() == false)
+            while (iterator.MoveNext())
             {
                 if (pred.eval(iterator.currentItem())) sum++;
-                iterator.Next();
             }
             return sum;
         }
@@ -115,10 +122,9 @@ namespace BTM
 
             iterator.First();
 
-            while (iterator.isDone() == false)
+            while (iterator.MoveNext())
             {
                 Console.WriteLine(iterator.currentItem().ToString());
-                iterator.Next();
             }
         }
     }
