@@ -11,5 +11,5 @@ User is being given 10 commands:
 |undo  |   undoes last command            | undo |
 |redo  |   redoes last undo            | redo |
 |history  |     prints history of executed commands| history |
-|export|   exports executed commands to xml or txt | export \<filename\> \<format\> (format = xml\|plaintext) |
+|export|   exports executed commands to xml or txt | export \<filename\> \<format\> (format = xml \| plaintext) |
 |load  |   loads commands to be executed from given file | load \<filename\> |
