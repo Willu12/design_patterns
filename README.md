@@ -3,9 +3,9 @@ It allows data to be stored in different representation  and provides a user int
 User is being given 10 commands: 
 | name | desripton     | command syntax    |
 |----- |---------------|---------------|
-|list  |  lists chosen collection| list <collection> |
+|list  |  lists chosen collection| list \<collection\> |
 |add   |  adds new element to collection in chosen representation | add \<collection\> \<representation\> |
-|edit  |  edits chosen item | edit <collection> <predicate> (<fieldname> (=|<|>) <value>)|
+|edit  |  edits chosen item | edit \<collection\> \<predicate\> (\<fieldname\> (=\|\<\|\>) \<value\>)|
 |find  |   prints items that satisfy given predicats | find <collection> <predicate> (same as edit) |
 | delete| deletes items that satisfy giver predicats | delete <collection> <predicate> (same as edit) |
 |undo  |   undoes last command            | undo |
