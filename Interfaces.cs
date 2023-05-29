@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using System.Xml.Serialization;
 
 namespace BTM
 {
@@ -81,9 +82,26 @@ namespace BTM
     }
     public interface ICommand
     {
-        void execute(string s = "");
-       // DataStorer DataStorer { get; set; }
-        bool checkcommandLine(string commandLine);
+        void execute(string s);
+        void undo();
+        void execute();
+        string saveCommand();
+        
+    }
+
+    /*
+    public interface IQueueableCommand : ICommand//,ISerializable<IQueueableCommand>
+    {
+        bool enqueue(string s = "");
+        string saveCommand();
+        void execute();
+
+    }
+    */
+
+    public interface ICommandFactory
+    {
+        ICommand createCommand();
     }
 
     public interface ICollectionPrinter
@@ -99,6 +117,15 @@ namespace BTM
     public interface ICollectionEditor
     {
         void editItem(string field, int sign, string value);
+        void undoEditItem();
+        void prepareEditItem(string field, int sign, string value);
+        Dictionary<string, string> getFieldsMap { get; }
+    }
+
+    public interface ICollectionDeletor
+    {
+        void deleteItem(string field, int sign, string value);
+        void restoreItem();
     }
     public interface ICollectionFilter
     {

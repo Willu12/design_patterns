@@ -3,7 +3,7 @@ namespace BTM
 {
     public class CommandFind : ICommand
     {
-        private DataStorer _dataStorer;
+        private DataStorer _dataStorer = DataStorer.GetDataStorer();
         private Dictionary<string, ICollectionFilter> collectionFiltersMap;
         private string collectionName;
         private string field;
@@ -11,18 +11,15 @@ namespace BTM
         private string signSymbol;
         private string value;
 
-        public CommandFind(DataStorer dataStorer)
+        public CommandFind()
         {
-            DataStorer = dataStorer;
             createCollectionFiltersMap();
         }
 
         public DataStorer DataStorer { get => _dataStorer; set => _dataStorer = value; }
 
-        public void execute(string commandLine)
+        public void execute()
         {
-            if (getValuesFromString(commandLine) == false) return;
-
             if(collectionFiltersMap.ContainsKey(collectionName) == false)
             {
                 Console.WriteLine("this collection doesnt exists");
@@ -30,7 +27,13 @@ namespace BTM
             }
             ICollectionFilter collectionFilter = collectionFiltersMap[collectionName];
             collectionFilter.printFilteredCollection(field, sign, value);
+        }
 
+        public void execute(string commandLine)
+        {
+            if (checkcommandLine(commandLine) == false) return;
+            if (CommandHistory.getCommandHistory().addCommand(this, commandLine) == false) return;
+            execute();
         }
         private bool getValuesFromString(string commandLine)
         {
@@ -82,9 +85,25 @@ namespace BTM
             return true;
         }
 
+        public bool enqueue(string s = "")
+        {
+            if (checkcommandLine(s)) return true;
+            return false;
+        }
+
         public override string ToString()
         {
             return $"command Find, {collectionName} that {field} {signSymbol} {value}";
+        }
+
+        public string saveCommand()
+        {
+            return "";
+        }
+
+        public void undo()
+        {
+            ; Console.WriteLine($"command {this} undoed");
         }
     }
 

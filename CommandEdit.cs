@@ -4,9 +4,10 @@ using System;
 namespace BTM
 {
 	public class CommandEdit : ICommand
-	{
+    {
         private Dictionary<string, ICollectionEditor> collectionEditorsMap;
         private string? type;
+        private DataStorer _dataStorer = DataStorer.GetDataStorer();
 
         private string collectionName;
         private string field;
@@ -14,17 +15,44 @@ namespace BTM
         private string signSymbol;
         string value;
 
-
-        public CommandEdit(DataStorer dataStorer)
+        public CommandEdit()
         {
-            DataStorer = dataStorer;
             createCollectionFiltersMap();
         }
-        public DataStorer DataStorer { get; set; }
+        public DataStorer DataStorer { get => _dataStorer; set => _dataStorer = value; }
+
+        public bool checkcommandLine(string commandLine)
+        {
+            if (getValuesFromString(commandLine) == false)
+            {
+                return false;
+            }
+            if (collectionEditorsMap.ContainsKey(collectionName) == false)
+            {
+                Console.WriteLine("this collection doesnt exists");
+                return false;
+            }
+            ICollectionEditor collectionEditor = collectionEditorsMap[collectionName];
+            collectionEditor.prepareEditItem(field, sign, value);
+            return true;
+        }
+
+        public bool enqueue(string s)
+        {
+            if (checkcommandLine(s)) return true;
+            return false;
+        }
 
         public void execute(string s)
         {
-            if(getValuesFromString(s) == false) return;
+            if (checkcommandLine(s) == false) return;
+            if (CommandHistory.getCommandHistory().addCommand(this, s) == false) return;
+            ICollectionEditor collectionEditor = collectionEditorsMap[collectionName];
+            collectionEditor.editItem(field,sign,value);
+        }
+
+        public void execute()
+        {
             if (collectionEditorsMap.ContainsKey(collectionName) == false)
             {
                 Console.WriteLine("this collection doesnt exists");
@@ -32,7 +60,6 @@ namespace BTM
             }
             ICollectionEditor collectionEditor = collectionEditorsMap[collectionName];
             collectionEditor.editItem(field, sign, value);
-
         }
 
         private void createCollectionFiltersMap()
@@ -73,23 +100,27 @@ namespace BTM
             return 0;
         }
 
-        public bool checkcommandLine(string commandLine)
-        {
-            if(getValuesFromString(commandLine) == false)
-            {
-                return false;
-            }
-            if (collectionEditorsMap.ContainsKey(collectionName) == false)
-            {
-                Console.WriteLine("this collection doesnt exists");
-                return false;
-            }
-            return true;
-        }
-
         public override string ToString()
         {
             return $"Command Edit: editing item from {collectionName} that satisfies {field} {signSymbol} {value}";
+        }
+
+        public string saveCommand()
+        {
+            string s = "";
+            foreach (var item in collectionEditorsMap[collectionName].getFieldsMap)
+            {
+                s += $"{item.Key}={item.Value}\n";
+            }
+            s += "done";
+            return s;
+        }
+
+        public void undo()
+        {
+            Console.WriteLine($"{this} undoed");
+            ICollectionEditor collectionEditor = collectionEditorsMap[collectionName];
+            collectionEditor.undoEditItem();
         }
     }
 
@@ -99,6 +130,8 @@ namespace BTM
         protected Dictionary<string, string> fieldMap;
         private ICollection<T>? collection;
         protected T? item;
+
+        public Dictionary<string, string> getFieldsMap => fieldMap;
 
         public CollectionEditor()
         {
@@ -112,9 +145,15 @@ namespace BTM
 
             collection = collectionFilter.FilteredCollection;
 
-            if(collection == null || collection.Count() != 1)
+            if (collection == null)
             {
-                Console.WriteLine("couldnt find one specific item to edit");
+                Console.WriteLine($"There is no item that satisfies given criteria");
+                return false;
+            }
+
+            if (collection.Count() != 1)
+            {
+                Console.WriteLine("there is more than one item that satisfies given criteria");
                 return false;
             }
             item = collection.CreateForwardIterator().currentItem();
@@ -122,6 +161,7 @@ namespace BTM
         }
 
         public abstract void editItem(string field, int sign, string value);
+        public abstract void prepareEditItem(string field, int sign, string value);
         
         public void getFields()
         {
@@ -146,6 +186,8 @@ namespace BTM
                 fieldMap[commandLine.Substring(0, index)] = commandLine.Substring(index + 1);
             }
         }
+
+        public abstract void undoEditItem();
     }
 
     public class LineEditor : CollectionEditor<ILine>
@@ -158,16 +200,32 @@ namespace BTM
         {
             if (findItem(field, sign, value) == false) return;
             if (item == null) return;
-            fieldMap["commonname"] = item.CommonName;
-            fieldMap["numberdec"] = item.NumberDec.ToString();
-            fieldMap["numberhex"] = item.NumberHex;
-
-            getFields();
-
             item.CommonName = fieldMap["commonname"];
             item.NumberDec = int.Parse(fieldMap["numberdec"]);
             item.NumberHex = item.NumberDec.ToString("X");
+        }
 
+        public override void prepareEditItem(string field, int sign, string value)
+        {
+            if (findItem(field, sign, value) == false) return;
+            if (item == null) return;
+            fieldMap["commonname"] = item.CommonName;
+            fieldMap["numberdec"] = item.NumberDec.ToString();
+            fieldMap["numberhex"] = item.NumberHex;
+            fieldMap["oldcommonname"] = item.CommonName;
+            fieldMap["oldnumberdec"] = item.NumberDec.ToString();
+            fieldMap["oldnumberhex"] = item.NumberHex;
+
+
+            getFields();
+        }
+
+        public override void undoEditItem()
+        {
+            if (item == null) return;
+            item.CommonName = fieldMap["oldcommonname"];
+            item.NumberDec = int.Parse(fieldMap["oldnumberdec"]);
+            item.NumberHex = item.NumberDec.ToString("X");
         }
     }
 
@@ -181,17 +239,32 @@ namespace BTM
         {
             if (findItem(field, sign, value) == false) return;
             if (item == null) return;
+            item.Name = fieldMap["name"];
+            item.Id = int.Parse(fieldMap["id"]);
+            item.Type = fieldMap["type"];
+        }
+
+        public override void prepareEditItem(string field, int sign, string value)
+        {
+            if (findItem(field, sign, value) == false) return;
+            if (item == null) return;
             fieldMap.Clear();
             fieldMap["name"] = item.Name;
             fieldMap["type"] = item.Type;
             fieldMap["id"] = item.Id.ToString();
+            fieldMap["oldname"] = item.Name;
+            fieldMap["oldtype"] = item.Type;
+            fieldMap["oldid"] = item.Id.ToString();
 
             getFields();
+        }
 
-            item.Name = fieldMap["name"];
-            item.Id = int.Parse(fieldMap["id"]);
-            item.Type = item.Type;
-
+        public override void undoEditItem()
+        {
+            if (item == null) return;
+            item.Name = fieldMap["oldname"];
+            item.Id = int.Parse(fieldMap["oldid"]);
+            item.Type = fieldMap["oldtype"];
         }
     }
 
@@ -205,16 +278,31 @@ namespace BTM
         {
             if (findItem(field, sign, value) == false) return;
             if (item == null) return;
+            item.Name = fieldMap["name"];
+            item.Seniority = int.Parse(fieldMap["seniority"]);
+            item.Surname = fieldMap["surname"];
+        }
+
+        public override void prepareEditItem(string field, int sign, string value)
+        {
+            if (findItem(field, sign, value) == false) return;
+            if (item == null) return;
             fieldMap.Clear();
             fieldMap["name"] = item.Name;
             fieldMap["surname"] = item.Surname;
             fieldMap["seniority"] = item.Seniority.ToString();
-
+            fieldMap["oldname"] = item.Name;
+            fieldMap["oldsurname"] = item.Surname;
+            fieldMap["oldseniority"] = item.Seniority.ToString();
             getFields();
+        }
 
-            item.Name = fieldMap["name"];
-            item.Seniority = int.Parse(fieldMap["seniority"]);
-            item.Surname = fieldMap["surname"];
+        public override void undoEditItem()
+        {
+            if (item == null) return;
+            item.Name = fieldMap["oldname"];
+            item.Seniority = int.Parse(fieldMap["oldseniority"]);
+            item.Surname = fieldMap["oldsurname"];
         }
     }
 
@@ -228,14 +316,26 @@ namespace BTM
         {
             if (findItem(field, sign, value) == false) return;
             if (item == null) return;
+            item.CarsNumber = int.Parse(fieldMap["carsnumber"]);
+            item.Id = int.Parse(fieldMap["id"]);
+        }
+        public override void prepareEditItem(string field, int sign, string value)
+        {
+            if (findItem(field, sign, value) == false) return;
+            if (item == null) return;
             fieldMap.Clear();
             fieldMap["carsnumber"] = item.CarsNumber.ToString();
             fieldMap["id"] = item.Id.ToString();
-
+            fieldMap["oldcarsnumber"] = item.CarsNumber.ToString();
+            fieldMap["oldid"] = item.Id.ToString();
             getFields();
+        }
 
-            item.CarsNumber = int.Parse(fieldMap["carsnumber"]);
-            item.Id = int.Parse(fieldMap["id"]);
+        public override void undoEditItem()
+        {
+            if (item == null) return;
+            item.CarsNumber = int.Parse(fieldMap["oldcarsnumber"]);
+            item.Id = int.Parse(fieldMap["oldid"]);
         }
     }
 
@@ -249,14 +349,27 @@ namespace BTM
         {
             if (findItem(field, sign, value) == false) return;
             if (item == null) return;
+            item.EngineClass = fieldMap["engineclass"];
+            item.Id = int.Parse(fieldMap["id"]);
+        }
+
+        public override void prepareEditItem(string field, int sign, string value)
+        {
+            if (findItem(field, sign, value) == false) return;
+            if (item == null) return;
             fieldMap.Clear();
             fieldMap["engineclass"] = item.EngineClass;
             fieldMap["id"] = item.Id.ToString();
-
+            fieldMap["oldengineclass"] = item.EngineClass;
+            fieldMap["oldid"] = item.Id.ToString();
             getFields();
+        }
 
-            item.EngineClass = fieldMap["engineclass"];
-            item.Id = int.Parse(fieldMap["id"]);
+        public override void undoEditItem()
+        {
+            if (item == null) return;
+            item.EngineClass = fieldMap["oldengineclass"];
+            item.Id = int.Parse(fieldMap["oldid"]);
         }
     }
 }

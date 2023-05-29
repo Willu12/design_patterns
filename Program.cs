@@ -212,27 +212,36 @@ namespace BTM
 
             #region createDataforCommands
             DataStorer dataStorer = DataStorer.createDataStorer(lines, bytebuses, trams, drivers, stops);
-            CommandQueue commandQueue = CommandQueue.getCommandQueue();
+            
 
-            string[] possibleTypes = new string[] { "lines", "stops", "bytebus", "trams", "drivers" };
+            string[] possibleTypes = new string[] { "lines", "stops", "bytebus", "trams", "drivers" };  
             List<String> possibleType = new List<String>(possibleTypes);
-            Dictionary<string, ICommand> commandMap = new Dictionary<string, ICommand>();
-            CommandList commandList = new CommandList(dataStorer);
-            CommandFind commandFind = new CommandFind(dataStorer);
-            CommandAdd commandAdd = new CommandAdd(dataStorer);
-            CommandEdit commandEdit = new CommandEdit(dataStorer);
-            commandPrintQueue commandPrintQueue = new commandPrintQueue(commandQueue);
-            commandCommitQueue commandCommitQueue = new commandCommitQueue(commandQueue);
-            commandExportQueue commandExportQueue = new commandExportQueue(commandQueue);
-            commandMap.Add("list",commandList);
-            commandMap.Add("find", commandFind);
-            commandMap.Add("add", commandAdd);
-            commandMap.Add("edit", commandEdit);
-            commandMap.Add("print", commandPrintQueue);
-            commandMap.Add("commit", commandCommitQueue);
-            commandMap.Add("export", commandExportQueue);
             
+            Dictionary<string, ICommandFactory> commandFactoryMap = new Dictionary<string, ICommandFactory>();
             
+            CommandListFactory commandListFactory = new CommandListFactory();
+            CommandFindFactory commandFindFactory = new CommandFindFactory();
+            CommandAddFactory commandAddFactory = new CommandAddFactory();
+            CommandEditFactory commandEditFactory = new CommandEditFactory();
+            CommandDeleteFactory commandDeleteFactory = new CommandDeleteFactory();
+            CommandHistory commandQueue = CommandHistory.createCommandHistory(commandFactoryMap);
+            CommandPrintQueueFactory commandPrintQueueFactory = new CommandPrintQueueFactory();
+            CommandExportQueueFactory commandExportQueueFactory = new CommandExportQueueFactory();
+            CommandLoadQueueFactory commandLoadQueueFactory = new CommandLoadQueueFactory();
+            CommandUndoFactory commandUndoFactory = new CommandUndoFactory();
+            CommandRedoFactory commandRedoFactory = new CommandRedoFactory();
+
+            commandFactoryMap.Add("list",commandListFactory);
+            commandFactoryMap.Add("find", commandFindFactory);
+            commandFactoryMap.Add("add", commandAddFactory);
+            commandFactoryMap.Add("edit", commandEditFactory);
+            commandFactoryMap.Add("history",commandPrintQueueFactory);
+            commandFactoryMap.Add("export", commandExportQueueFactory);
+            commandFactoryMap.Add("delete", commandDeleteFactory);
+            commandFactoryMap.Add("load", commandLoadQueueFactory);
+            commandFactoryMap.Add("undo", commandUndoFactory);
+            commandFactoryMap.Add("redo", commandRedoFactory);
+
             ICommand? command = null;
             #endregion createDataforCommands
 
@@ -246,19 +255,14 @@ namespace BTM
                 wordsList.RemoveAll(item => item ==" " || item =="");
                 words = wordsList.ToArray();
                 string commandName = words[0];
-                if (words[0] == "queue") commandName = words[1];
                 if (commandName == "exit") break;
-
-                if (commandMap.ContainsKey(commandName) == false)
+                if (commandFactoryMap.ContainsKey(commandName) == false)
                 {
                     Console.WriteLine("Invalid Command");
                     continue;
                 }
-                command = commandMap[commandName];
-
-
-                if(words[0] == "queue") command.execute(commandLine.ToLower());
-                else  commandQueue.addCommand(command, commandLine.ToLower());
+                command = commandFactoryMap[commandName].createCommand();
+                command.execute(commandLine.ToLower());
             }
             Console.WriteLine("Terminating...");
             return;

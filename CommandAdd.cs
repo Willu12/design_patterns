@@ -1,35 +1,50 @@
 ﻿using System;
 using System.Collections;
 using System.Runtime.InteropServices;
+using System.Runtime.Serialization;
+using System.Xml;
+using System.Xml.Schema;
+using System.Xml.Serialization;
 
 namespace BTM
 {
+    [Serializable]
     public class CommandAdd :ICommand
     {
         private string? representation;
         private string? type;
-        private DataStorer dataStorer;
         private Dictionary<string, ItemAdder> itemAddersMap;
+
+
+        [IgnoreDataMember]
+        private DataStorer dataStorer = DataStorer.GetDataStorer();
+
 
         public DataStorer DataStorer { get => dataStorer; set => dataStorer = value; }
 
-        public CommandAdd(DataStorer dataStorer)
+        public CommandAdd()
         {
-            this.dataStorer = dataStorer;
             createItemAddersMap();
         }
 
-        public void execute(string commandLine)
+        public void execute()
         {
-            if (getValueFromCommandLine(commandLine) == false) return;
+            if (type == null || representation == null) return;
             if (itemAddersMap.ContainsKey(type) == false)
             {
                 Console.WriteLine("invalid type");
                 return;
             }
             ItemAdder itemAdder = itemAddersMap[type];
-            itemAdder.getFields();
             itemAdder.addItem(representation);
+        }
+
+        public void execute(string commandLine)
+        {
+            // enqueue(commandLine);
+            if (checkcommandLine(commandLine) == false) return ;
+            if (CommandHistory.getCommandHistory().addCommand(this,commandLine) == false) return;
+            execute();
 
         }
         private bool getValueFromCommandLine(string commandLine)
@@ -52,7 +67,23 @@ namespace BTM
                 Console.WriteLine("invallid representation");
                 return false;
             }
+            
+
+            if (itemAddersMap.ContainsKey(type) == false)
+            {
+                Console.WriteLine("invalid type");
+                return false ;
+            }
+            ItemAdder itemAdder = itemAddersMap[type];
+            if(itemAdder.getFields() == false) return false;
+
             return true;
+        }
+
+        public bool enqueue(string s = "")
+        {
+            if (checkcommandLine(s)) return true;
+            return false;
         }
 
         private void createItemAddersMap()
@@ -80,6 +111,27 @@ namespace BTM
         {
             return $"comamnd Add, {type} in {representation} representation";
         }
+
+        public string saveCommand()
+        {
+            string s = "";
+            foreach(var item in itemAddersMap[type].getFieldMap)
+            {
+                s += $"{item.Key}={item.Value}\n";
+            }
+            s += "done\n";
+            return s;
+        }
+
+      
+
+        public void undo()
+        {
+            Console.WriteLine($"command {this} undoed");
+            ItemAdder itemAdder = itemAddersMap[type];
+            itemAdder.deleteItem();
+
+        }
     }
 
     public abstract class ItemAdder: IItemAdder
@@ -87,7 +139,10 @@ namespace BTM
         protected Dictionary<string, string> fieldMap;
         protected DataStorer dataStorer;
 
+        public Dictionary<string, string> getFieldMap { get => fieldMap; }
+
         public abstract void addItem(string representation);
+        public abstract void deleteItem();
 
         protected ItemAdder(DataStorer dataStorer)
         {
@@ -95,7 +150,7 @@ namespace BTM
             createFieldMap();
         }
 
-        public void getFields()
+        public bool getFields()
         {
             while (true)
             {
@@ -105,7 +160,7 @@ namespace BTM
                 if (commandLine == "exit")
                 {
                     Console.WriteLine("Creating Aborted");
-                    break;
+                    return false;
                 }
                 if (commandLine == "done")
                 {
@@ -114,7 +169,7 @@ namespace BTM
                         Console.WriteLine("Not all fields are set");
                         continue;
                     }
-                    return;
+                    return true;
                 }
 
                 int index = commandLine.IndexOf('=');
@@ -136,6 +191,7 @@ namespace BTM
         protected string commonName;
         protected int numberDec;
         protected string numberHex;
+        protected ILine line;
 
         public LineAdder(DataStorer dataStorer) : base(dataStorer)
         {
@@ -150,7 +206,13 @@ namespace BTM
                 return;
             }
             ILineCreator lineCreator = lineCreatorsMap[representation];
-            dataStorer.lines.Add(lineCreator.createLine(numberDec, numberHex, commonName));
+            line = lineCreator.createLine(numberDec, numberHex, commonName);
+            dataStorer.lines.Add(line);
+        }
+
+        public override void deleteItem()
+        {
+            dataStorer.lines.Delete(line);
         }
 
         protected override bool checkFields()
@@ -186,6 +248,7 @@ namespace BTM
         protected string name;
         protected int id;
         protected string type;
+        protected IStop stop;
 
         public StopAdder(DataStorer dataStorer) : base(dataStorer)
         {
@@ -200,7 +263,12 @@ namespace BTM
                 return;
             }
             IStopCreator stopCreator = stopCreatorsMap[representation];
-            dataStorer.stops.Add(stopCreator.createStop(id, name, type));
+            stop = stopCreator.createStop(id, name, type);
+            dataStorer.stops.Add(stop);
+        }
+        public override void deleteItem()
+        {
+            dataStorer.stops.Delete(stop);
         }
 
         protected override bool checkFields()
@@ -236,6 +304,7 @@ namespace BTM
         protected Dictionary<string, IBytebusCreator> bytebusCreatorsMap;
         protected int id;
         protected string engineClass;
+        protected IBytebus bytebus;
 
         public BytebusAdder(DataStorer dataStorer) : base(dataStorer)
         {
@@ -250,7 +319,13 @@ namespace BTM
                 return;
             }
             IBytebusCreator bytebusCreator = bytebusCreatorsMap[representation];
-            dataStorer.bytebuses.Add(bytebusCreator.createBytebus(id,engineClass));
+            bytebus = bytebusCreator.createBytebus(id, engineClass);
+            dataStorer.bytebuses.Add(bytebus);
+        }
+
+        public override void deleteItem()
+        {
+            dataStorer.bytebuses.Delete(bytebus);
         }
 
         protected override bool checkFields()
@@ -284,6 +359,7 @@ namespace BTM
         protected Dictionary<string, ITramCreator> tramCreatorsMap;
         protected int id;
         protected int carsNumber;
+        protected ITram tram;
 
         public TramAdder(DataStorer dataStorer) : base(dataStorer)
         {
@@ -298,7 +374,13 @@ namespace BTM
                 return;
             }
             ITramCreator tramCreator = tramCreatorsMap[representation];
-            dataStorer.trams.Add(tramCreator.createTram(id,carsNumber));
+            tram = tramCreator.createTram(id, carsNumber);
+            dataStorer.trams.Add(tram);
+        }
+
+        public override void deleteItem()
+        {
+            dataStorer.trams.Delete(tram);
         }
 
         protected override bool checkFields()
@@ -333,6 +415,7 @@ namespace BTM
         protected int seniority;
         protected string name;
         protected string surname;
+        protected IDriver driver;
 
         public DriverAdder(DataStorer dataStorer) : base(dataStorer)
         {
@@ -347,7 +430,13 @@ namespace BTM
                 return;
             }
             IDriverCreator driverCreator = driverCreatorsMap[representation];
-            dataStorer.drivers.Add(driverCreator.createDriver(name,surname,seniority));
+            driver = driverCreator.createDriver(name, surname, seniority);
+            dataStorer.drivers.Add(driver);
+        }
+
+        public override void deleteItem()
+        {
+            dataStorer.drivers.Delete(driver);
         }
 
         protected override bool checkFields()

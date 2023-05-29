@@ -3,25 +3,22 @@ namespace BTM
 {
     public class CommandList : ICommand
     {
-        private DataStorer _dataStorer;
+        private DataStorer _dataStorer = DataStorer.GetDataStorer();
         private Dictionary<string, ICollectionPrinter> collectionPrintersMap;
         private List<string> words;
         public DataStorer DataStorer { get => _dataStorer; set => _dataStorer = value;}
 
-        
-
-        public CommandList(DataStorer data)
+        public CommandList()
         {
-            this.DataStorer = data;
             words = new List<string>();
             createCollectionPrintersMap();
         }
 
-        public void execute(string commandLine)
+        public void execute()
         {
-            string[] collectionNames = GetValuesFromString(commandLine);
+            string[] collectionNames = words.ToArray();
 
-            foreach(string collectionName in collectionNames)
+            foreach (string collectionName in collectionNames)
             {
                 if (collectionPrintersMap.ContainsKey(collectionName) == false)
                 {
@@ -31,6 +28,12 @@ namespace BTM
                 ICollectionPrinter collectionPrinter = collectionPrintersMap[collectionName];
                 collectionPrinter.printCollection();
             }
+        }
+        public void execute(string commandLine)
+        {
+            if (checkcommandLine(commandLine) == false) return;
+            if (CommandHistory.getCommandHistory().addCommand(this, commandLine) == false) return;
+            execute();
         }
 
         private void createCollectionPrintersMap()
@@ -62,6 +65,12 @@ namespace BTM
             return true;
         }
 
+        public bool enqueue(string s = "")
+        {
+            if(checkcommandLine(s)) return true;
+            return false;
+        }
+
         public override string ToString()
         {
             string s = "Command List : ";
@@ -70,6 +79,18 @@ namespace BTM
                 s += $"{word} ";
             }
             return s;
+        }
+
+        public string saveCommand()
+        {
+            return "";
+        }
+
+       
+
+        public void undo()
+        {
+            Console.WriteLine($"command {this} undoed");
         }
     }
     public class CollectionPrinter<T> : ICollectionPrinter
