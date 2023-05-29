@@ -23,23 +23,23 @@ Line
 			- stops (list of stops refs)
 			- vehicles (list of vehicles refs)
 			
-		Stop
+Stop
 			- id (int)
 			- lines (list of lines refs)
 			- name (string)
 			- type (enum string)
 			
-		Bytebus : Vehicle
+Bytebus : Vehicle
 			- id (int)
 			- lines (list of lines refs)
 			- engineClass (enum string)
 		
-		Tram : Vehicle
+Tram : Vehicle
 			- id (int)
 			- carsNumber (int)
 			- line (line ref)
 
-		Driver
+Driver
 			- vehicles (list of vehicles refs)
 			- name (string)
 			- surname (string)
