@@ -3,6 +3,6 @@ It allows data to be stored in different formats and provides a user interface f
 User is being given 5 commands: 
 | name | desripton     |
 |----- |---------------|
-|     1|               |
+|list|               |
 |     2|               |
 |     3|               |
